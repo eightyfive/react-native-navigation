@@ -3,4 +3,6 @@
 
 - (void)bindViewController:(UIViewController *)viewController;
 
+- (BOOL)isCustomTransitioned;
+
 @end

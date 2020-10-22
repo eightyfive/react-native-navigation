@@ -1,12 +1,12 @@
 package com.reactnativenavigation.viewcontrollers.toptabs;
 
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.reactnativenavigation.options.Options;
-import com.reactnativenavigation.viewcontrollers.viewcontroller.ViewController;
+import com.reactnativenavigation.parse.Options;
+import com.reactnativenavigation.viewcontrollers.ViewController;
 
 import java.util.List;
 
@@ -46,7 +46,7 @@ public class TopTabsAdapter extends PagerAdapter implements ViewPager.OnPageChan
     @Override
     public void onPageSelected(int position) {
         tabs.get(currentPage).onViewDisappear();
-        tabs.get(position).onViewWillAppear();
+        tabs.get(position).onViewAppeared();
         currentPage = position;
     }
 

@@ -1,12 +1,15 @@
 #import "UINavigationController+RNNOptions.h"
 #import "RNNFontAttributesCreator.h"
-#import "UIView+Utils.h"
 
 const NSInteger BLUR_TOPBAR_TAG = 78264802;
 
 @implementation UINavigationController (RNNOptions)
 
-- (void)setRootBackgroundImage:(UIImage *)backgroundImage {
+- (void)rnn_setInteractivePopGestureEnabled:(BOOL)enabled {
+	self.interactivePopGestureRecognizer.enabled = enabled;
+}
+
+- (void)rnn_setRootBackgroundImage:(UIImage *)backgroundImage {
 	UIImageView* backgroundImageView = (self.view.subviews.count > 0) ? self.view.subviews[0] : nil;
 	if (![backgroundImageView isKindOfClass:[UIImageView class]]) {
 		backgroundImageView = [[UIImageView alloc] initWithFrame:self.view.bounds];
@@ -18,23 +21,60 @@ const NSInteger BLUR_TOPBAR_TAG = 78264802;
 	[backgroundImageView setContentMode:UIViewContentModeScaleAspectFill];
 }
 
-- (void)setNavigationBarTestId:(NSString *)testID {
+- (void)rnn_setNavigationBarTestID:(NSString *)testID {
 	self.navigationBar.accessibilityIdentifier = testID;
 }
 
-- (void)setNavigationBarVisible:(BOOL)visible animated:(BOOL)animated {
+- (void)rnn_setNavigationBarVisible:(BOOL)visible animated:(BOOL)animated {
 	[self setNavigationBarHidden:!visible animated:animated];
 }
 
-- (void)hideBarsOnScroll:(BOOL)hideOnScroll {
+- (void)rnn_hideBarsOnScroll:(BOOL)hideOnScroll {
 	self.hidesBarsOnSwipe = hideOnScroll;
 }
 
-- (void)setBarStyle:(UIBarStyle)barStyle {
+- (void)rnn_setNavigationBarNoBorder:(BOOL)noBorder {
+	if (noBorder) {
+		[self.navigationBar setShadowImage:[[UIImage alloc] init]];
+	} else {
+		[self.navigationBar setShadowImage:nil];
+	}
+}
+
+- (void)rnn_setBarStyle:(UIBarStyle)barStyle {
 	self.navigationBar.barStyle = barStyle;
 }
 
-- (void)setNavigationBarBlur:(BOOL)blur {
+- (void)rnn_setNavigationBarFontFamily:(NSString *)fontFamily fontSize:(NSNumber *)fontSize fontWeight:(NSString *)fontWeight color:(UIColor *)color {
+	NSDictionary* fontAttributes = [RNNFontAttributesCreator createWithFontFamily:fontFamily fontSize:fontSize fontWeight:fontWeight color:color];
+	
+	if (fontAttributes.allKeys.count > 0) {
+		self.navigationBar.titleTextAttributes = fontAttributes;
+	}
+}
+
+- (void)rnn_setNavigationBarLargeTitleVisible:(BOOL)visible {
+	if (@available(iOS 11.0, *)) {
+		if (visible){
+			self.navigationBar.prefersLargeTitles = YES;
+		} else {
+			self.navigationBar.prefersLargeTitles = NO;
+		}
+	}
+}
+
+- (void)rnn_setNavigationBarLargeTitleFontFamily:(NSString *)fontFamily fontSize:(NSNumber *)fontSize fontWeight:(NSString *)fontWeight color:(UIColor *)color {
+	if (@available(iOS 11.0, *)) {
+		NSDictionary* fontAttributes = [RNNFontAttributesCreator createWithFontFamily:fontFamily fontSize:fontSize fontWeight:fontWeight color:color];
+		self.navigationBar.largeTitleTextAttributes = fontAttributes;
+	}
+}
+
+- (void)rnn_setNavigationBarTranslucent:(BOOL)translucent {
+	self.navigationBar.translucent = translucent;
+}
+
+- (void)rnn_setNavigationBarBlur:(BOOL)blur {
 	if (blur && ![self.navigationBar viewWithTag:BLUR_TOPBAR_TAG]) {
 		[self.navigationBar setBackgroundImage:[UIImage new] forBarMetrics:UIBarMetricsDefault];
 		self.navigationBar.shadowImage = [UIImage new];
@@ -55,18 +95,12 @@ const NSInteger BLUR_TOPBAR_TAG = 78264802;
 	}
 }
 
-- (void)setNavigationBarClipsToBounds:(BOOL)clipsToBounds {
+- (void)rnn_setBackButtonColor:(UIColor *)color {
+	self.navigationBar.tintColor = color;
+}
+
+- (void)rnn_setNavigationBarClipsToBounds:(BOOL)clipsToBounds {
 	self.navigationBar.clipsToBounds = clipsToBounds;
-}
-
-- (void)setBackButtonTestID:(NSString *)testID {
-    UIView* navigationBarContentView = [self.navigationBar findChildByClass:NSClassFromString(@"_UINavigationBarContentView")];
-    UIView* barButton = [navigationBarContentView findChildByClass:NSClassFromString(@"_UIButtonBarButton")];
-    if (barButton) barButton.accessibilityIdentifier = testID;
-}
-
-- (CGFloat)getTopBarHeight {
-    return self.navigationBar.frame.size.height;
 }
 
 @end

@@ -1,23 +1,20 @@
 package com.reactnativenavigation.viewcontrollers.modal;
 
-import android.view.View;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.support.annotation.Nullable;
 import android.view.ViewGroup;
 
-import com.reactnativenavigation.options.ModalPresentationStyle;
-import com.reactnativenavigation.options.Options;
-import com.reactnativenavigation.react.CommandListener;
-import com.reactnativenavigation.utils.ScreenAnimationListener;
-import com.reactnativenavigation.viewcontrollers.viewcontroller.ViewController;
-
-import androidx.annotation.Nullable;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-
-import static com.reactnativenavigation.utils.CoordinatorLayoutUtils.matchParentLP;
+import com.reactnativenavigation.anim.ModalAnimator;
+import com.reactnativenavigation.parse.ModalPresentationStyle;
+import com.reactnativenavigation.parse.Options;
+import com.reactnativenavigation.utils.CommandListener;
+import com.reactnativenavigation.viewcontrollers.ViewController;
 
 public class ModalPresenter {
 
     private ViewGroup rootLayout;
-    private CoordinatorLayout modalsLayout;
+    private ViewGroup modalsLayout;
     private ModalAnimator animator;
     private Options defaultOptions = new Options();
 
@@ -25,11 +22,11 @@ public class ModalPresenter {
         this.animator = animator;
     }
 
-    void setRootLayout(ViewGroup rootLayout) {
+    public void setRootLayout(ViewGroup rootLayout) {
         this.rootLayout = rootLayout;
     }
 
-    void setModalsLayout(CoordinatorLayout modalsLayout) {
+    void setModalsLayout(ViewGroup modalsLayout) {
         this.modalsLayout = modalsLayout;
     }
 
@@ -42,14 +39,10 @@ public class ModalPresenter {
             listener.onError("Can not show modal before activity is created");
             return;
         }
-
         Options options = toAdd.resolveCurrentOptions(defaultOptions);
         toAdd.setWaitForRender(options.animations.showModal.waitForRender);
-        modalsLayout.setVisibility(View.VISIBLE);
-        modalsLayout.addView(toAdd.getView(), matchParentLP());
-
+        modalsLayout.addView(toAdd.getView());
         if (options.animations.showModal.enabled.isTrueOrUndefined()) {
-            toAdd.getView().setAlpha(0);
             if (options.animations.showModal.waitForRender.isTrue()) {
                 toAdd.addOnAppearedListener(() -> animateShow(toAdd, toRemove, listener, options));
             } else {
@@ -65,27 +58,16 @@ public class ModalPresenter {
     }
 
     private void animateShow(ViewController toAdd, ViewController toRemove, CommandListener listener, Options options) {
-        animator.show(toAdd.getView(), options.animations.showModal, new ScreenAnimationListener() {
+        animator.show(toAdd.getView(), options.animations.showModal, new AnimatorListenerAdapter() {
             @Override
-            public void onStart() {
-                toAdd.getView().setAlpha(1);
-            }
-
-            @Override
-            public void onEnd() {
+            public void onAnimationEnd(Animator animation) {
                 onShowModalEnd(toAdd, toRemove, listener);
-            }
-
-            @Override
-            public void onCancel() {
-                listener.onSuccess(toAdd.getId());
             }
         });
     }
 
     private void onShowModalEnd(ViewController toAdd, @Nullable ViewController toRemove, CommandListener listener) {
-        toAdd.onViewDidAppear();
-        if (toRemove != null && toAdd.resolveCurrentOptions(defaultOptions).modal.presentationStyle != ModalPresentationStyle.OverCurrentContext) {
+        if (toRemove != null && toAdd.options.modal.presentationStyle != ModalPresentationStyle.OverCurrentContext) {
             toRemove.detachView();
         }
         listener.onSuccess(toAdd.getId());
@@ -96,15 +78,12 @@ public class ModalPresenter {
             listener.onError("Can not dismiss modal before activity is created");
             return;
         }
-        if (toAdd != null) {
-            toAdd.attachView(toAdd == root ? rootLayout : modalsLayout, 0);
-            toAdd.onViewDidAppear();
-        }
+        if (toAdd != null) toAdd.attachView(toAdd == root ? rootLayout : modalsLayout, 0);
         Options options = toDismiss.resolveCurrentOptions(defaultOptions);
         if (options.animations.dismissModal.enabled.isTrueOrUndefined()) {
-            animator.dismiss(toDismiss.getView(), options.animations.dismissModal, new ScreenAnimationListener() {
+            animator.dismiss(toDismiss.getView(), options.animations.dismissModal, new AnimatorListenerAdapter() {
                 @Override
-                public void onEnd() {
+                public void onAnimationEnd(Animator animation) {
                     onDismissEnd(toDismiss, listener);
                 }
             });
@@ -114,12 +93,7 @@ public class ModalPresenter {
     }
 
     private void onDismissEnd(ViewController toDismiss, CommandListener listener) {
-        listener.onSuccess(toDismiss.getId());
         toDismiss.destroy();
-        if (isEmpty()) modalsLayout.setVisibility(View.GONE);
-    }
-
-    private boolean isEmpty() {
-        return modalsLayout.getChildCount() == 0;
+        listener.onSuccess(toDismiss.getId());
     }
 }

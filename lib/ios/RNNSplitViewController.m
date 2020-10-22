@@ -3,36 +3,18 @@
 
 @implementation RNNSplitViewController
 
-- (void)setViewControllers:(NSArray<__kindof UIViewController *> *)viewControllers {
-    [super setViewControllers:viewControllers];
-    UIViewController<UISplitViewControllerDelegate>* masterViewController = viewControllers[0];
-    self.delegate = masterViewController;
+- (void)bindChildViewControllers:(NSArray<UIViewController<RNNLayoutProtocol> *> *)viewControllers {
+	[self setViewControllers:viewControllers];
+	UIViewController<UISplitViewControllerDelegate>* masterViewController = viewControllers[0];
+	self.delegate = masterViewController;
+}
+
+-(void)viewWillAppear:(BOOL)animated{
+	[super viewWillAppear:animated];
 }
 
 - (UIViewController *)getCurrentChild {
-    return self.viewControllers[0];
-}
-
-# pragma mark - UIViewController overrides
-
-- (void)willMoveToParentViewController:(UIViewController *)parent {
-    [self.presenter willMoveToParentViewController:parent];
-}
-
-- (UIStatusBarStyle)preferredStatusBarStyle {
-    return [self.presenter getStatusBarStyle];
-}
-
-- (BOOL)prefersStatusBarHidden {
-    return [self.presenter getStatusBarVisibility];
-}
-
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return [self.presenter getOrientation];
-}
-
-- (BOOL)hidesBottomBarWhenPushed {
-    return [self.presenter hidesBottomBarWhenPushed];
+	return self.viewControllers[0];
 }
 
 @end

@@ -1,79 +1,17 @@
 // tslint:disable jsdoc-format
 import { ImageRequireSource, Insets } from 'react-native';
 
-// TODO: Import ColorValue instead when upgrading @types/react-native to 0.63+
-// Only assign PlatformColor or DynamicColorIOS as a Color symbol!
-declare type Color = string | symbol;
+type Color = string;
 type FontFamily = string;
-type FontStyle = 'normal' | 'italic';
-type FontWeightIOS =
-  | 'normal'
-  | 'ultralight'
-  | 'thin'
-  | 'light'
-  | 'regular'
-  | 'medium'
-  | 'semibold'
-  | 'demibold'
-  | 'extrabold'
-  | 'ultrabold'
-  | 'bold'
-  | 'heavy'
-  | 'black';
-type FontWeight =
-  | 'normal'
-  | 'bold'
-  | '100'
-  | '200'
-  | '300'
-  | '400'
-  | '500'
-  | '600'
-  | '700'
-  | '800'
-  | '900'
-  | FontWeightIOS;
-export type LayoutOrientation = 'portrait' | 'landscape';
+type FontWeight = 'regular' | 'bold' | 'thin' | 'ultraLight' | 'light' | 'medium' | 'semibold' | 'heavy' | 'black';
+type LayoutOrientation = 'portrait' | 'landscape';
 type AndroidDensityNumber = number;
-type SystemItemIcon =
-  | 'done'
-  | 'cancel'
-  | 'edit'
-  | 'save'
-  | 'add'
-  | 'flexibleSpace'
-  | 'fixedSpace'
-  | 'compose'
-  | 'reply'
-  | 'action'
-  | 'organize'
-  | 'bookmarks'
-  | 'search'
-  | 'refresh'
-  | 'stop'
-  | 'camera'
-  | 'trash'
-  | 'play'
-  | 'pause'
-  | 'rewind'
-  | 'fastForward'
-  | 'undo'
-  | 'redo';
-type Interpolation =
-  | { type: 'accelerate'; factor?: number }
-  | { type: 'decelerate'; factor?: number }
-  | { type: 'decelerateAccelerate' }
-  | { type: 'accelerateDecelerate' }
-  | { type: 'linear' }
-  | { type: 'overshoot'; tension?: number }
-  | {
-      type: 'spring';
-      mass?: number;
-      damping?: number;
-      stiffness?: number;
-      allowsOverdamping?: boolean;
-      initialVelocity?: number;
-    };
+type SystemItemIcon = 'done' | 'cancel' | 'edit'
+  | 'save' | 'add' | 'flexibleSpace' | 'fixedSpace'
+  | 'compose' | 'reply' | 'action' | 'organize'
+  | 'bookmarks' | 'search' | 'refresh' | 'stop'
+  | 'camera' | 'trash' | 'play' | 'pause'
+  | 'rewind' | 'fastForward' | 'undo' | 'redo';
 
 export interface OptionsSplitView {
   /**
@@ -94,11 +32,6 @@ export interface OptionsSplitView {
    * Set the maximum width of master view
    */
   maxWidth?: number;
-  /**
-   * Set background style of sidebar. Currently works for Mac Catalyst apps only.
-   * @default 'none'
-   */
-  primaryBackgroundStyle?: 'none' | 'sidebar';
 }
 
 export interface OptionsStatusBar {
@@ -122,30 +55,9 @@ export interface OptionsStatusBar {
    * #### (Android specific)
    */
   drawBehind?: boolean;
-  /**
-   * Allows the StatusBar to be translucent (blurred)
-   * #### (Android specific)
-   */
-  translucent?: boolean;
-  /**
-   * Animate StatusBar style changes.
-   * #### (iOS specific)
-   */
-  animated?: boolean;
-  /**
-   * Automatically hide the StatusBar when the TopBar hides.
-   * #### (iOS specific)
-   */
-  hideWithTopBar?: boolean;
-  /**
-   * Blur content beneath the StatusBar.
-   * #### (iOS specific)
-   */
-  blur?: boolean;
 }
 
 export interface OptionsLayout {
-  fitSystemWindows?: boolean;
   /**
    * Set the screen background color
    */
@@ -169,13 +81,7 @@ export interface OptionsLayout {
    * Set language direction.
    * only works with DefaultOptions
    */
-  direction?: 'rtl' | 'ltr' | 'locale';
-
-  /**
-   * Controls the application's preferred home indicator auto-hiding.
-   * #### (iOS specific)
-   */
-  autoHideHomeIndicator?: boolean;
+  direction?: 'rtl' | 'ltr';
 }
 
 export enum OptionsModalPresentationStyle {
@@ -184,16 +90,16 @@ export enum OptionsModalPresentationStyle {
   overFullScreen = 'overFullScreen',
   overCurrentContext = 'overCurrentContext',
   currentContext = 'currentContext',
-  popover = 'popover',
+  popOver = 'popOver',
   fullScreen = 'fullScreen',
-  none = 'none',
+  none = 'none'
 }
 
 export enum OptionsModalTransitionStyle {
   coverVertical = 'coverVertical',
   crossDissolve = 'crossDissolve',
   flipHorizontal = 'flipHorizontal',
-  partialCurl = 'partialCurl',
+  partialCurl = 'partialCurl'
 }
 
 export interface OptionsTopBarLargeTitle {
@@ -210,17 +116,12 @@ export interface OptionsTopBarLargeTitle {
    */
   color?: Color;
   /**
-   * Set the font family of the large title text
+   * Set the font family of large title's text
    */
   fontFamily?: FontFamily;
   /**
-   * Set the font style of the large title text
-   */
-  fontStyle?: FontStyle;
-  /**
-   * Specifies font weight. The values 'normal' and 'bold' are supported
-   * for most fonts. Not all fonts have a variant for each of the numeric
-   * values, in that case the closest one is chosen.
+   * Set the font weight, ignore fontFamily and use the iOS system fonts instead
+   * #### (iOS specific)
    */
   fontWeight?: FontWeight;
 }
@@ -239,17 +140,14 @@ export interface OptionsTopBarTitle {
    */
   color?: Color;
   /**
-   * Set the font family for the title
+   * Title font family
+   *
+   * Make sure that the font is available
    */
   fontFamily?: FontFamily;
   /**
-   * Set the font style for the title
-   */
-  fontStyle?: FontStyle;
-  /**
-   * Specifies font weight. The values 'normal' and 'bold' are supported
-   * for most fonts. Not all fonts have a variant for each of the numeric
-   * values, in that case the closest one is chosen.
+   * Set the font weight, ignore fontFamily and use the iOS system fonts instead
+   * #### (iOS specific)
    */
   fontWeight?: FontWeight;
   /**
@@ -299,17 +197,12 @@ export interface OptionsTopBarSubtitle {
    */
   color?: Color;
   /**
-   * Set the font family for the subtitle
+   * Set subtitle font family
    */
   fontFamily?: FontFamily;
   /**
-   * Set the font style for a text
-   */
-  fontStyle?: FontStyle;
-  /**
-   * Specifies font weight. The values 'normal' and 'bold' are supported
-   * for most fonts. Not all fonts have a variant for each of the numeric
-   * values, in that case the closest one is chosen.
+   * Set the font weight, ignore fontFamily and use the iOS system fonts instead
+   * #### (iOS specific)
    */
   fontWeight?: FontWeight;
   /**
@@ -320,19 +213,9 @@ export interface OptionsTopBarSubtitle {
 
 export interface OptionsTopBarBackButton {
   /**
-   * Overrides the text that's read by the screen reader when the user interacts with the back button
-   * #### (Android specific)
-   */
-  accessibilityLabel?: string;
-  /**
-   * Button id for reference press event
-   * #### (Android specific)
-   */
-  id?: string;
-  /**
    * Image to show as the back button
    */
-  icon?: ImageResource;
+  icon?: ImageRequireSource;
   /**
    * Weither the back button is visible or not
    * @default true
@@ -352,29 +235,6 @@ export interface OptionsTopBarBackButton {
    * Back button icon and text color
    */
   color?: Color;
-  /**
-   * Set subtitle font size
-   */
-  fontSize?: number;
-  /**
-   * Set the font family for the back button
-   * #### (iOS specific)
-   */
-  fontFamily?: FontFamily;
-  /**
-   * Set the font style for a text
-   */
-  fontStyle?: FontStyle;
-  /**
-   * Specifies font weight. The values 'normal' and 'bold' are supported
-   * for most fonts. Not all fonts have a variant for each of the numeric
-   * values, in that case the closest one is chosen.
-   */
-  fontWeight?: FontWeight;
-  /**
-   * Set testID for reference in E2E tests
-   */
-  testID?: string;
 }
 
 export interface OptionsTopBarBackground {
@@ -411,45 +271,26 @@ export interface OptionsTopBarBackground {
 
 export interface OptionsTopBarButton {
   /**
-   * (Android only) Sets a textual button to be ALL CAPS. default value is true
-   */
-  allCaps?: boolean;
-  /**
    * Button id for reference press event
    */
   id: string;
   /**
    * Set the button icon
    */
-  icon?: ImageResource;
+  icon?: ImageRequireSource;
   /**
-   * Set the button icon insets
-   */
+  * Set the button icon insets
+  */
   iconInsets?: IconInsets;
   /**
    * Set the button as a custom component
    */
   component?: {
-    /**
-     * Component reference id, Auto generated if empty
-     */
-    id?: string;
-    /**
-     * Name of your component
-     */
     name: string;
     /**
      * Properties to pass down to the component
      */
     passProps?: object;
-    /**
-     * (Android only) component width
-     */
-    width?: number;
-    /**
-     * (Android only) component height
-     */
-    height?: number;
   };
   /**
    * (iOS only) Set the button as an iOS system icon
@@ -460,27 +301,14 @@ export interface OptionsTopBarButton {
    */
   text?: string;
   /**
-   * Overrides the text that's read by the screen reader when the user interacts with the element
+   * Set the button font family
    */
-  accessibilityLabel?: string;
+  fontFamily?: string;
   /**
-   * Set the font family for the button's text
-   */
-  fontFamily?: FontFamily;
-  /**
-   * Set the font style for the button's text
-   */
-  fontStyle?: FontStyle;
-  /**
-   * Specifies font weight. The values 'normal' and 'bold' are supported
-   * for most fonts. Not all fonts have a variant for each of the numeric
-   * values, in that case the closest one is chosen.
+   * Set the font weight, ignore fontFamily and use the iOS system fonts instead
+   * #### (iOS specific)
    */
   fontWeight?: FontWeight;
-  /**
-   * Set the font size in dp
-   */
-  fontSize?: number;
   /**
    * Set the button enabled or disabled
    * @default true
@@ -504,19 +332,9 @@ export interface OptionsTopBarButton {
   testID?: string;
   /**
    * (Android only) Set showAsAction value
-   * @see {@link https://developer.android.com/guide/topics/resources/menu-resource|Android developer guide: Menu resource}
+   * @see {@link https://developer.android.com/guide/topics/resources/menu-resource|Android developer guide: Menu resource} 
    */
   showAsAction?: 'ifRoom' | 'withText' | 'always' | 'never';
-}
-
-export interface OptionsSearchBar {
-  visible?: boolean;
-  hideOnScroll?: boolean;
-  hideTopBarOnFocus?: boolean;
-  obscuresBackgroundDuringPresentation?: boolean;
-  backgroundColor?: Color;
-  tintColor?: Color;
-  placeholder?: string;
 }
 
 export interface OptionsTopBar {
@@ -589,7 +407,7 @@ export interface OptionsTopBar {
    * Show a UISearchBar in the Top Bar
    * #### (iOS 11+ specific)
    */
-  searchBar?: OptionsSearchBar;
+  searchBar?: boolean;
   /**
    * Hides the UISearchBar when scrolling
    * #### (iOS 11+ specific)
@@ -600,16 +418,6 @@ export interface OptionsTopBar {
    * #### (iOS 11+ specific)
    */
   searchBarPlaceholder?: string;
-  /**
-   * The background color of the UISearchBar's TextField
-   * #### (iOS 13+ specific)
-   */
-  searchBarBackgroundColor?: string;
-  /**
-   * The tint color of the UISearchBar
-   * #### (iOS 11+ specific)
-   */
-  searchBarTintColor?: string;
   /**
    * Controls Hiding NavBar on focus UISearchBar
    * #### (iOS 11+ specific)
@@ -647,51 +455,19 @@ export interface OptionsTopBar {
   topMargin?: number;
 }
 
-export interface SharedElementTransition {
-  fromId: string;
-  toId: string;
-  duration?: number;
-  interpolation?: Interpolation;
-}
-
-export interface ElementTransition {
-  id: string;
-  alpha?: AppearingElementAnimation | DisappearingElementAnimation;
-  translationX?: AppearingElementAnimation | DisappearingElementAnimation;
-  translationY?: AppearingElementAnimation | DisappearingElementAnimation;
-  scaleX?: AppearingElementAnimation | DisappearingElementAnimation;
-  scaleY?: AppearingElementAnimation | DisappearingElementAnimation;
-  rotationX?: AppearingElementAnimation | DisappearingElementAnimation;
-  rotationY?: AppearingElementAnimation | DisappearingElementAnimation;
-  x?: AppearingElementAnimation | DisappearingElementAnimation;
-  y?: AppearingElementAnimation | DisappearingElementAnimation;
-}
-
-export interface AppearingElementAnimation extends ElementAnimation {
-  from: number;
-}
-
-export interface DisappearingElementAnimation extends ElementAnimation {
-  to: number;
-}
-
-export interface ElementAnimation {
-  duration: number;
-  startDelay?: number;
-  interpolation?: Interpolation;
-}
-
 export interface OptionsFab {
   id: string;
   backgroundColor?: Color;
   clickColor?: Color;
   rippleColor?: Color;
   visible?: boolean;
-  icon?: ImageResource;
+  icon?: ImageRequireSource;
   iconColor?: Color;
   alignHorizontally?: 'left' | 'right';
+  alignVertically?: 'top' | 'bottom';
   hideOnScroll?: boolean;
-  size?: 'mini' | 'regular';
+  size?: number;
+  actions?: OptionsFab[];
 }
 
 export interface OptionsBottomTabs {
@@ -703,12 +479,6 @@ export interface OptionsBottomTabs {
    * Enable animations when toggling visibility
    */
   animate?: boolean;
-  /**
-   * Use large icons when possible, even when three tabs without titles are displayed
-   * #### (android specific)
-   * @default false
-   */
-  preferLargeIcons?: boolean;
   /**
    * Switch to another screen within the bottom tabs via index (starting from 0)
    */
@@ -755,39 +525,25 @@ export interface OptionsBottomTabs {
    * Control the text display mode below the tab icon
    * #### (Android specific)
    */
-  titleDisplayMode?: 'alwaysShow' | 'showWhenActive' | 'alwaysHide' | 'showWhenActiveForce';
+  titleDisplayMode?: 'alwaysShow' | 'showWhenActive' | 'alwaysHide';
   /**
    * Set the elevation of the Bottom Tabs in dp
    * #### (Android specific)
    */
   elevation?: AndroidDensityNumber;
-  /**
-   * Hides the BottomTabs on scroll to increase the amount of content visible to the user.
-   * The options requires that the scrollable view will be the root view of the screen and that it specifies `nestedScrollEnabled: true`.
-   * #### (Android specific)
-   */
-  hideOnScroll?: boolean;
 }
 
 export interface DotIndicatorOptions {
-  // default red
-  color?: Color;
-  // default 6
-  size?: number;
-  // default false
-  visible?: boolean;
+    // default red
+    color?: Color;
+    // default 6
+    size?: number;
+    // default false
+    visible?: boolean;
 }
-
-export interface ImageSystemSource {
-  system: string;
-  fallback?: ImageRequireSource | string;
-}
-
-export type ImageResource = ImageRequireSource | string | ImageSystemSource;
 
 export interface OptionsBottomTab {
-  dotIndicator?: DotIndicatorOptions;
-
+    dotIndicator?: DotIndicatorOptions;
   /**
    * Set the text to display below the icon
    */
@@ -801,18 +557,13 @@ export interface OptionsBottomTab {
    */
   badgeColor?: string;
   /**
-   * Show the badge with the animation.
-   * #### (Android specific)
-   */
-  animateBadge?: boolean;
-  /**
    * Set a testID to reference the tab in E2E tests
    */
   testID?: string;
   /**
    * Set the tab icon
    */
-  icon?: ImageResource;
+  icon?: ImageRequireSource;
   /**
    * Set the icon tint
    */
@@ -830,17 +581,12 @@ export interface OptionsBottomTab {
    */
   selectedTextColor?: Color;
   /**
-   * Set the font family for the tab's text
+   * Set the text font family
    */
   fontFamily?: FontFamily;
-  /**
-   * Set the font style for the tab's text
-   */
-  fontStyle?: FontStyle;
-  /**
-   * Specifies font weight. The values 'normal' and 'bold' are supported
-   * for most fonts. Not all fonts have a variant for each of the numeric
-   * values, in that case the closest one is chosen.
+    /**
+   * Set the font weight, ignore fontFamily and use the iOS system fonts instead
+   * #### (iOS specific)
    */
   fontWeight?: FontWeight;
   /**
@@ -856,7 +602,7 @@ export interface OptionsBottomTab {
    * Set selected icon image
    * #### (iOS specific)
    */
-  selectedIcon?: ImageResource;
+  selectedIcon?: ImageRequireSource;
   /**
    * Set true if you want to disable the icon tinting
    * #### (iOS specific)
@@ -872,11 +618,6 @@ export interface OptionsBottomTab {
    * #### (Android specific)
    */
   selectedFontSize?: number;
-  /**
-   * If it's set to false, pressing a tab won't select the tab
-   * instead it will emit a bottomTabPressedEvent
-   */
-  selectTabOnPress?: boolean;
 }
 
 export interface SideMenuSide {
@@ -896,12 +637,6 @@ export interface SideMenuSide {
    * Set the height of the side menu
    */
   height?: number;
-  /**
-   * Stretch sideMenu contents when opened past the width
-   * #### (iOS specific)
-   * @default true
-   */
-  shouldStretchDrawer?: boolean;
 }
 
 export interface OptionsSideMenu {
@@ -931,14 +666,6 @@ export interface OverlayOptions {
    * Set this to true if your Overlay contains a TextInput.
    */
   handleKeyboardEvents?: boolean;
-}
-
-export interface ModalOptions {
-  /**
-   * Control wether this modal should be dismiss using swipe gesture when the modalPresentationStyle = 'pageSheet'
-   * #### (iOS specific)
-   */
-  swipeToDismiss?: boolean;
 }
 
 export interface OptionsPreviewAction {
@@ -974,7 +701,7 @@ export interface OptionsPreview {
   /**
    * Height of the preview
    */
-  height?: number;
+  height?: 100;
   /**
    * You can control if the users gesture will result in pushing
    * the preview screen into the stack.
@@ -1009,7 +736,7 @@ export interface OptionsAnimationPropertyConfig {
   /**
    * Animation interplation
    */
-  interpolation?: Interpolation;
+  interpolation?: 'accelerate' | 'decelerate';
 }
 
 /**
@@ -1018,21 +745,13 @@ export interface OptionsAnimationPropertyConfig {
  */
 export interface ScreenAnimationOptions {
   /**
-   * Animate the element over x value
+   * Animate the element over translateX
    */
   x?: OptionsAnimationPropertyConfig;
   /**
-   * Animate the element over y value
-   */
-  y?: OptionsAnimationPropertyConfig;
-  /**
-   * Animate the element over translateX
-   */
-  translationX?: OptionsAnimationPropertyConfig;
-  /**
    * Animate the element over translateY
    */
-  translationY?: OptionsAnimationPropertyConfig;
+  y?: OptionsAnimationPropertyConfig;
   /**
    * Animate the element over opacity
    */
@@ -1094,17 +813,6 @@ export interface ViewAnimationOptions extends ScreenAnimationOptions {
   id?: string;
 }
 
-export interface ModalAnimationOptions extends ViewAnimationOptions {
-  /**
-   * Animations to be applied on elements which are shared between the appearing and disappearing screens
-   */
-  sharedElementTransitions?: SharedElementTransition[];
-  /**
-   * Animations to be applied on views in the appearing or disappearing screens
-   */
-  elementTransitions?: ElementTransition[];
-}
-
 /**
  * Used for describing stack commands animations.
  */
@@ -1130,14 +838,6 @@ export interface StackAnimationOptions {
    * Configure animations for the content (Screen)
    */
   content?: ViewAnimationOptions;
-  /**
-   * Animations to be applied on elements which are shared between the appearing and disappearing screens
-   */
-  sharedElementTransitions?: SharedElementTransition[];
-  /**
-   * Animations to be applied on views in the appearing or disappearing screens
-   */
-  elementTransitions?: ElementTransition[];
 }
 
 /**
@@ -1145,13 +845,9 @@ export interface StackAnimationOptions {
  */
 export interface AnimationOptions {
   /**
-   * Configure the setStackRoot animation
-   */
-  setStackRoot?: ViewAnimationOptions;
-  /**
    * Configure the setRoot animation
    */
-  setRoot?: ViewAnimationOptions;
+  setRoot?: ScreenAnimationOptions;
   /**
    * Configure what animates when a screen is pushed
    */
@@ -1163,29 +859,43 @@ export interface AnimationOptions {
   /**
    * Configure what animates when modal is shown
    */
-  showModal?: ModalAnimationOptions;
+  showModal?: ScreenAnimationOptions;
   /**
    * Configure what animates when modal is dismissed
    */
-  dismissModal?: ModalAnimationOptions;
+  dismissModal?: ScreenAnimationOptions;
 }
 
-/**
- * Configure Android's NavigationBar
- */
-export interface NavigationBarOptions {
-  backgroundColor?: Color;
-  visible?: boolean;
+export interface OptionsCustomTransition {
+  animations: OptionsCustomTransitionAnimation[];
+  duration?: number;
 }
 
-/**
- * Used for configuring and controlling the main window in iOS
- */
-export interface WindowOptions {
+export interface OptionsCustomTransitionAnimation {
   /**
-   * Configure the background color of the application's main window.
+   * Animation type, only support sharedElement currently
    */
-  backgroundColor?: Color;
+  type: 'sharedElement';
+  /**
+   * Transition from element Id
+   */
+  fromId: string;
+  /**
+   * Transition to element Id
+   */
+  toId: string;
+  /**
+   * Animation delay
+   */
+  startDelay?: number;
+  /**
+   * Animation spring Velocity
+   */
+  springVelocity?: number;
+  /**
+   * Animation duration
+   */
+  duration?: number;
 }
 
 export interface Options {
@@ -1233,10 +943,6 @@ export interface Options {
    */
   overlay?: OverlayOptions;
   /**
-   * Configure the modal
-   */
-  modal?: ModalOptions;
-  /**
    * Animation used for navigation commands that modify the layout
    * hierarchy can be controlled in options.
    *
@@ -1265,10 +971,25 @@ setRoot: {
   animations?: AnimationOptions;
 
   /**
-   * Configure Android's NavigationBar
-   */
-  navigationBar?: NavigationBarOptions;
-
+   * Custom Transition used for animate shared element between two screens
+   * Example:
+  ```js
+  Navigation.push(this.props.componentId, {
+    component: {
+      name: 'second.screen',
+      options: {
+        customTransition: {
+          animations: [
+            { type: 'sharedElement', fromId: 'image1', toId: 'image2', startDelay: 0, springVelocity: 0.2, duration: 0.5 }
+          ],
+          duration: 0.8
+        }
+      }
+    }
+  });
+  ```
+  */
+  customTransition?: OptionsCustomTransition;
   /**
    * Preview configuration for Peek and Pop
    * #### (iOS specific)
@@ -1284,21 +1005,20 @@ setRoot: {
    * Background image for the screen
    * #### (iOS specific)
    */
-  backgroundImage?: ImageResource;
+  backgroundImage?: ImageRequireSource;
   /**
    * Background image for the Navigation View
    * #### (iOS specific)
    */
-  rootBackgroundImage?: ImageResource;
-  /**
-   * Provides a way to configure the overall presentation of your application's main user interface
-   * #### (iOS specific)
-   */
-  window?: WindowOptions;
+  rootBackgroundImage?: ImageRequireSource;
   /**
    * Enable or disable automatically blurring focused input, dismissing keyboard on unmount
    * #### (Android specific)
    * @default false
    */
   blurOnUnmount?: boolean;
+  /**
+   * Props to pass to a component
+   */
+  passProps?: Record<string, any>;
 }

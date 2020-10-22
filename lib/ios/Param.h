@@ -2,8 +2,6 @@
 
 @interface Param : NSObject
 
-+ (instancetype)withValue:(id)value;
-
 - (instancetype)initWithValue:(id)value;
 
 - (id)get;

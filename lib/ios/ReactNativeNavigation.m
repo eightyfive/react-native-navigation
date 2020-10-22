@@ -16,16 +16,16 @@
 
 # pragma mark - public API
 
-+ (void)bootstrapWithDelegate:(id<RCTBridgeDelegate>)bridgeDelegate launchOptions:(NSDictionary *)launchOptions {
-    [[ReactNativeNavigation sharedInstance] bootstrapWithDelegate:bridgeDelegate launchOptions:launchOptions];
++(void)bootstrap:(NSURL *)jsCodeLocation launchOptions:(NSDictionary *)launchOptions {
+	[[ReactNativeNavigation sharedInstance] bootstrap:jsCodeLocation launchOptions:launchOptions];
+}
+
++(void)bootstrap:(NSURL *)jsCodeLocation launchOptions:(NSDictionary *)launchOptions bridgeManagerDelegate:(id<RNNBridgeManagerDelegate>)delegate {
+	[[ReactNativeNavigation sharedInstance] bootstrap:jsCodeLocation launchOptions:launchOptions bridgeManagerDelegate:delegate];
 }
 
 + (void)registerExternalComponent:(NSString *)name callback:(RNNExternalViewCreator)callback {
 	[[ReactNativeNavigation sharedInstance].bridgeManager registerExternalComponent:name callback:callback];
-}
-
-+ (NSArray<id<RCTBridgeModule>> *)extraModulesForBridge:(RCTBridge *)bridge {
-    return [[ReactNativeNavigation sharedInstance].bridgeManager extraModulesForBridge:bridge];
 }
 
 + (RCTBridge *)getBridge {
@@ -36,6 +36,9 @@
     return [RNNLayoutManager findComponentForId:componentId];
 }
 
++ (void)setJSCodeLocation:(NSURL *)jsCodeLocation {
+	[[ReactNativeNavigation sharedInstance].bridgeManager setJSCodeLocation:jsCodeLocation];
+}
 
 # pragma mark - instance
 
@@ -51,20 +54,30 @@
 	return instance;
 }
 
-- (void)bootstrapWithDelegate:(id<RCTBridgeDelegate>)bridgeDelegate launchOptions:(NSDictionary *)launchOptions {
-    UIWindow* mainWindow = [self initializeKeyWindowIfNeeded];
-	
-    self.bridgeManager = [[RNNBridgeManager alloc] initWithLaunchOptions:launchOptions andBridgeDelegate:bridgeDelegate mainWindow:mainWindow];
-    [self.bridgeManager initializeBridge];
-    [RNNSplashScreen showOnWindow:mainWindow];
+-(void)bootstrap:(NSURL *)jsCodeLocation launchOptions:(NSDictionary *)launchOptions {
+	[self bootstrap:jsCodeLocation launchOptions:launchOptions bridgeManagerDelegate:nil];
 }
 
-- (UIWindow *)initializeKeyWindowIfNeeded {
-	UIWindow* keyWindow = UIApplication.sharedApplication.delegate.window;
-	if (!keyWindow) {
-		keyWindow = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-		UIApplication.sharedApplication.delegate.window = keyWindow;
+-(void)bootstrap:(NSURL *)jsCodeLocation launchOptions:(NSDictionary *)launchOptions bridgeManagerDelegate:(id<RNNBridgeManagerDelegate>)delegate {
+	UIWindow* mainWindow = [self initializeKeyWindow];
+	
+	self.bridgeManager = [[RNNBridgeManager alloc] initWithJsCodeLocation:jsCodeLocation launchOptions:launchOptions bridgeManagerDelegate:delegate mainWindow:mainWindow];
+	[RNNSplashScreen showOnWindow:mainWindow];
+}
+
+- (UIWindow *)initializeKeyWindow {
+	UIWindow* keyWindow = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+if (@available(iOS 13.0, *)) {
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
+		keyWindow.backgroundColor = [UIColor systemBackgroundColor];
+#else
+		keyWindow.backgroundColor = [UIColor whiteColor];
+#endif
+	} else {
+		keyWindow.backgroundColor = [UIColor whiteColor];
 	}
+	UIApplication.sharedApplication.delegate.window = keyWindow;
+	
 	return keyWindow;
 }
 

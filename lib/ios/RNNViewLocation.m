@@ -1,63 +1,53 @@
 #import "RNNViewLocation.h"
-#import "RNNReactView.h"
-#import <React/RCTSafeAreaView.h>
 
 @implementation RNNViewLocation
 
-- (instancetype)initWithFromElement:(UIView *)fromElement toElement:(UIView *)toElement {
+- (instancetype)initWithFromElement:(RNNElementView *)fromElement toElement:(RNNElementView *)toElement startPoint:(CGPoint)startPoint endPoint:(CGPoint)endPoint andVC:(UIViewController *)vc {
 	self = [super init];
-    self.fromFrame = [self convertViewFrame:fromElement];
-    self.toFrame = [self convertViewFrame:toElement];
-    self.fromAngle = [self getViewAngle:fromElement];
-    self.toAngle = [self getViewAngle:toElement];
-    self.fromTransform = [self getTransform:fromElement];;
-    self.toTransform = [self getTransform:toElement];
-    self.toBounds = toElement.layer.bounds;
-    self.fromBounds = fromElement.layer.bounds;
-    self.fromCornerRadius = [self getCornerRadius:fromElement];
-    self.toCornerRadius = [self getCornerRadius:toElement];
+	
+	self.fromFrame = [self frameFromSuperViewController:[fromElement subviews][0] andVC:vc];
+	CGSize fromSize = self.fromFrame.size;
+	CGPoint fromCenter = [self centerFromSuperViewController:[fromElement subviews][0] andVC:vc];
+	fromCenter.x = fromCenter.x + startPoint.x;
+	fromCenter.y = fromCenter.y + startPoint.y;
+	self.fromCenter = fromCenter;
+	CGRect toFrame = [self frameFromSuperViewController:[fromElement subviews][0] andVC:vc];
+	CGSize toSize = self.fromFrame.size;
+	CGPoint toCenter = [self centerFromSuperViewController:[fromElement subviews][0] andVC:vc];
+	if (toElement) {
+	   toFrame = [self frameFromSuperViewController:[toElement subviews][0] andVC:vc];
+		toSize = toFrame.size;
+		toCenter = [self centerFromSuperViewController:[toElement subviews][0] andVC:vc];
+	}
+	toCenter.x = toCenter.x + endPoint.x;
+	toCenter.y = toCenter.y + endPoint.y;
+	
+	CGAffineTransform transform = CGAffineTransformMakeScale(toSize.width/fromSize.width ,toSize.height/fromSize.height);
+	CGAffineTransform transformBack = CGAffineTransformMakeScale(fromSize.width/toSize.width ,fromSize.height/toSize.height);
+	
+	self.toFrame = toFrame;
+	self.fromSize = fromSize;
+	self.toSize = toSize;
+	self.toCenter = toCenter;
+	self.transform = transform;
+	self.transformBack = transformBack;
+	
 	return self;
 }
 
-- (CGFloat)getCornerRadius:(UIView *)view {
-    if (view.layer.cornerRadius > 0) {
-        return view.layer.cornerRadius;
-    } else if (CGRectEqualToRect(view.frame, view.superview.bounds)) {
-        return [self getCornerRadius:view.superview];
-    }
-    
-    return 0;
+- (CGRect)frameFromSuperViewController:(UIView *)view andVC:(UIViewController *)vc{
+	CGPoint sharedViewFrameOrigin = [view.superview convertPoint:view.frame.origin toView:vc.view];
+	CGRect originRect = CGRectMake(sharedViewFrameOrigin.x, sharedViewFrameOrigin.y, view.frame.size.width, view.frame.size.height);
+	return originRect;
 }
 
-- (CATransform3D)getTransform:(UIView *)view {
-    if (view) {
-        if (!CATransform3DEqualToTransform(view.layer.transform, CATransform3DIdentity)) {
-            return view.layer.transform;
-        } else {
-            return [self getTransform:view.superview];
-        }
-    }
-
-    return CATransform3DIdentity;
-}
-
-- (CGRect)convertViewFrame:(UIView *)view {
-    CGPoint center = [view.superview convertPoint:view.center toView:nil];
-    CGRect frame = CGRectMake(center.x - view.bounds.size.width / 2, center.y - view.bounds.size.height / 2, view.bounds.size.width, view.bounds.size.height);
-    return frame;
-}
-
-- (CGFloat)getViewAngle:(UIView *)view {
-    CGFloat radians = atan2f(view.transform.b, view.transform.a);
-    return radians;
-}
-
- - (UIView *)topMostView:(UIView *)view {
-    if ([view isKindOfClass:[RNNReactView class]]) {
-        return view;
-    } else {
-        return [self topMostView:view.superview];
-    }
+- (CGPoint)centerFromSuperViewController:(UIView *)view andVC:(UIViewController *)vc{
+	CGPoint sharedViewFrameOrigin = [view.superview convertPoint:view.frame.origin toView:vc.view];
+	CGRect originRect = CGRectMake(sharedViewFrameOrigin.x, sharedViewFrameOrigin.y, view.frame.size.width, view.frame.size.height);
+	CGFloat x = originRect.origin.x + view.frame.size.width/2;
+	CGFloat y = originRect.origin.y + view.frame.size.height/2;
+	CGPoint center = CGPointMake(x, y);
+	return center;
 }
 
 @end

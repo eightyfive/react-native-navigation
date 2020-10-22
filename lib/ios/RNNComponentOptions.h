@@ -7,6 +7,4 @@
 @property (nonatomic, strong) Text* alignment;
 @property (nonatomic, strong) Bool* waitForRender;
 
-- (BOOL)hasValue;
-
 @end

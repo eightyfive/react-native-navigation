@@ -1,6 +1,4 @@
-import forEach from 'lodash/forEach';
-import filter from 'lodash/filter';
-import invoke from 'lodash/invoke';
+import * as _ from 'lodash';
 import { mock, verify, instance, deepEqual, when, anything, anyString } from 'ts-mockito';
 
 import { LayoutTreeParser } from './LayoutTreeParser';
@@ -12,9 +10,6 @@ import { NativeCommandsSender } from '../adapters/NativeCommandsSender';
 import { OptionsProcessor } from './OptionsProcessor';
 import { UniqueIdProvider } from '../adapters/UniqueIdProvider';
 import { Options } from '../interfaces/Options';
-import { LayoutProcessor } from '../processors/LayoutProcessor';
-import { LayoutProcessorsStore } from '../processors/LayoutProcessorsStore';
-import { CommandName } from '../interfaces/CommandName';
 
 describe('Commands', () => {
   let uut: Commands;
@@ -22,7 +17,6 @@ describe('Commands', () => {
   let mockedStore: Store;
   let commandsObserver: CommandsObserver;
   let mockedUniqueIdProvider: UniqueIdProvider;
-  let layoutProcessor: LayoutProcessor;
 
   beforeEach(() => {
     mockedNativeCommandsSender = mock(NativeCommandsSender);
@@ -31,13 +25,9 @@ describe('Commands', () => {
     const uniqueIdProvider = instance(mockedUniqueIdProvider);
     mockedStore = mock(Store);
     commandsObserver = new CommandsObserver(uniqueIdProvider);
-    const layoutProcessorsStore = new LayoutProcessorsStore();
 
     const mockedOptionsProcessor = mock(OptionsProcessor);
     const optionsProcessor = instance(mockedOptionsProcessor) as OptionsProcessor;
-
-    layoutProcessor = new LayoutProcessor(layoutProcessorsStore);
-    jest.spyOn(layoutProcessor, 'process');
 
     uut = new Commands(
       mockedStore,
@@ -46,15 +36,14 @@ describe('Commands', () => {
       new LayoutTreeCrawler(instance(mockedStore), optionsProcessor),
       commandsObserver,
       uniqueIdProvider,
-      optionsProcessor,
-      layoutProcessor
+      optionsProcessor
     );
   });
 
   describe('setRoot', () => {
     it('sends setRoot to native after parsing into a correct layout tree', () => {
       uut.setRoot({
-        root: { component: { name: 'com.example.MyScreen' } },
+        root: { component: { name: 'com.example.MyScreen' } }
       });
       verify(
         mockedNativeCommandsSender.setRoot(
@@ -64,10 +53,10 @@ describe('Commands', () => {
               type: 'Component',
               id: 'Component+UNIQUE_ID',
               children: [],
-              data: { name: 'com.example.MyScreen', options: {}, passProps: undefined },
+              data: { name: 'com.example.MyScreen', options: {}, passProps: undefined }
             },
             modals: [],
-            overlays: [],
+            overlays: []
           })
         )
       ).called();
@@ -85,7 +74,7 @@ describe('Commands', () => {
       uut.setRoot({
         root: { component: { name: 'com.example.MyScreen' } },
         modals: [{ component: { name: 'com.example.MyModal' } }],
-        overlays: [{ component: { name: 'com.example.MyOverlay' } }],
+        overlays: [{ component: { name: 'com.example.MyOverlay' } }]
       });
       verify(
         mockedNativeCommandsSender.setRoot(
@@ -98,8 +87,8 @@ describe('Commands', () => {
               data: {
                 name: 'com.example.MyScreen',
                 options: {},
-                passProps: undefined,
-              },
+                passProps: undefined
+              }
             },
             modals: [
               {
@@ -109,9 +98,9 @@ describe('Commands', () => {
                 data: {
                   name: 'com.example.MyModal',
                   options: {},
-                  passProps: undefined,
-                },
-              },
+                  passProps: undefined
+                }
+              }
             ],
             overlays: [
               {
@@ -121,23 +110,13 @@ describe('Commands', () => {
                 data: {
                   name: 'com.example.MyOverlay',
                   options: {},
-                  passProps: undefined,
-                },
-              },
-            ],
+                  passProps: undefined
+                }
+              }
+            ]
           })
         )
       ).called();
-    });
-
-    it('process layout with layoutProcessor', () => {
-      uut.setRoot({
-        root: { component: { name: 'com.example.MyScreen' } },
-      });
-      expect(layoutProcessor.process).toBeCalledWith(
-        { component: { name: 'com.example.MyScreen' } },
-        CommandName.SetRoot
-      );
     });
   });
 
@@ -155,18 +134,13 @@ describe('Commands', () => {
 
   describe('updateProps', () => {
     it('delegates to store', () => {
-      uut.updateProps('theComponentId', { someProp: 'someValue' });
-      verify(mockedStore.updateProps('theComponentId', deepEqual({ someProp: 'someValue' })));
+      uut.updateProps('theComponentId', {someProp: 'someValue'});
+      verify(mockedStore.updateProps('theComponentId', deepEqual({someProp: 'someValue'})));
     });
 
     it('notifies commands observer', () => {
-      uut.updateProps('theComponentId', { someProp: 'someValue' });
-      verify(
-        commandsObserver.notify(
-          'updateProps',
-          deepEqual({ componentId: 'theComponentId', props: { someProp: 'someValue' } })
-        )
-      );
+      uut.updateProps('theComponentId', {someProp: 'someValue'});
+      verify(commandsObserver.notify('updateProps', deepEqual({componentId: 'theComponentId', props: {someProp: 'someValue'}})));
     });
   });
 
@@ -182,9 +156,9 @@ describe('Commands', () => {
             data: {
               name: 'com.example.MyScreen',
               options: {},
-              passProps: undefined,
+              passProps: undefined
             },
-            children: [],
+            children: []
           })
         )
       ).called();
@@ -196,14 +170,6 @@ describe('Commands', () => {
       );
       const result = await uut.showModal({ component: { name: 'com.example.MyScreen' } });
       expect(result).toEqual('the resolved layout');
-    });
-
-    it('process layout with layoutProcessor', () => {
-      uut.showModal({ component: { name: 'com.example.MyScreen' } });
-      expect(layoutProcessor.process).toBeCalledWith(
-        { component: { name: 'com.example.MyScreen' } },
-        CommandName.ShowModal
-      );
     });
   });
 
@@ -251,7 +217,7 @@ describe('Commands', () => {
         'the resolved layout'
       );
       const result = await uut.push('theComponentId', {
-        component: { name: 'com.example.MyScreen' },
+        component: { name: 'com.example.MyScreen' }
       });
       expect(result).toEqual('the resolved layout');
     });
@@ -268,20 +234,12 @@ describe('Commands', () => {
             data: {
               name: 'com.example.MyScreen',
               options: {},
-              passProps: undefined,
+              passProps: undefined
             },
-            children: [],
+            children: []
           })
         )
       ).called();
-    });
-
-    it('process layout with layoutProcessor', () => {
-      uut.push('theComponentId', { component: { name: 'com.example.MyScreen' } });
-      expect(layoutProcessor.process).toBeCalledWith(
-        { component: { name: 'com.example.MyScreen' } },
-        CommandName.Push
-      );
     });
   });
 
@@ -355,21 +313,13 @@ describe('Commands', () => {
               data: {
                 name: 'com.example.MyScreen',
                 options: {},
-                passProps: undefined,
+                passProps: undefined
               },
-              children: [],
-            },
+              children: []
+            }
           ])
         )
       ).called();
-    });
-
-    it('process layout with layoutProcessor', () => {
-      uut.setStackRoot('theComponentId', [{ component: { name: 'com.example.MyScreen' } }]);
-      expect(layoutProcessor.process).toBeCalledWith(
-        { component: { name: 'com.example.MyScreen' } },
-        CommandName.SetStackRoot
-      );
     });
   });
 
@@ -385,9 +335,9 @@ describe('Commands', () => {
             data: {
               name: 'com.example.MyScreen',
               options: {},
-              passProps: undefined,
+              passProps: undefined
             },
-            children: [],
+            children: []
           })
         )
       ).called();
@@ -399,14 +349,6 @@ describe('Commands', () => {
       );
       const result = await uut.showOverlay({ component: { name: 'com.example.MyScreen' } });
       expect(result).toEqual('Component1');
-    });
-
-    it('process layout with layoutProcessor', () => {
-      uut.showOverlay({ component: { name: 'com.example.MyScreen' } });
-      expect(layoutProcessor.process).toBeCalledWith(
-        { component: { name: 'com.example.MyScreen' } },
-        CommandName.ShowOverlay
-      );
     });
   });
 
@@ -450,14 +392,13 @@ describe('Commands', () => {
         instance(mockedLayoutTreeCrawler),
         commandsObserver,
         instance(anotherMockedUniqueIdProvider),
-        instance(mockedOptionsProcessor),
-        new LayoutProcessor(new LayoutProcessorsStore())
+        instance(mockedOptionsProcessor)
       );
     });
 
     function getAllMethodsOfUut() {
       const uutFns = Object.getOwnPropertyNames(Commands.prototype);
-      const methods = filter(uutFns, (fn) => fn !== 'constructor');
+      const methods = _.filter(uutFns, (fn) => fn !== 'constructor');
       expect(methods.length).toBeGreaterThan(1);
       return methods;
     }
@@ -478,12 +419,12 @@ describe('Commands', () => {
         setStackRoot: ['id', [{}]],
         showOverlay: [{}],
         dismissOverlay: ['id'],
-        getLaunchArgs: ['id'],
+        getLaunchArgs: ['id']
       };
       const paramsForMethodName: Record<string, object> = {
         setRoot: {
           commandId: 'setRoot+UNIQUE_ID',
-          layout: { root: null, modals: [], overlays: [] },
+          layout: { root: null, modals: [], overlays: [] }
         },
         setDefaultOptions: { options: {} },
         mergeOptions: { componentId: 'id', options: {} },
@@ -498,17 +439,17 @@ describe('Commands', () => {
         setStackRoot: {
           commandId: 'setStackRoot+UNIQUE_ID',
           componentId: 'id',
-          layout: [null],
+          layout: [null]
         },
         showOverlay: { commandId: 'showOverlay+UNIQUE_ID', layout: null },
         dismissOverlay: { commandId: 'dismissOverlay+UNIQUE_ID', componentId: 'id' },
-        getLaunchArgs: { commandId: 'getLaunchArgs+UNIQUE_ID' },
+        getLaunchArgs: { commandId: 'getLaunchArgs+UNIQUE_ID' }
       };
-      forEach(getAllMethodsOfUut(), (m) => {
+      _.forEach(getAllMethodsOfUut(), (m) => {
         it(`for ${m}`, () => {
           expect(argsForMethodName).toHaveProperty(m);
           expect(paramsForMethodName).toHaveProperty(m);
-          invoke(uut, m, ...argsForMethodName[m]);
+          _.invoke(uut, m, ...argsForMethodName[m]);
           expect(cb).toHaveBeenCalledTimes(1);
           expect(cb).toHaveBeenCalledWith(m, paramsForMethodName[m]);
         });

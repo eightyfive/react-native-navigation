@@ -3,6 +3,7 @@ package com.reactnativenavigation.react;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.RestrictTo;
 import android.view.MotionEvent;
 
 import com.facebook.react.ReactInstanceManager;
@@ -11,13 +12,13 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.uimanager.JSTouchDispatcher;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.events.EventDispatcher;
-import com.reactnativenavigation.viewcontrollers.viewcontroller.ScrollEventListener;
-import com.reactnativenavigation.react.events.ComponentType;
-import com.reactnativenavigation.react.events.EventEmitter;
-import com.reactnativenavigation.viewcontrollers.viewcontroller.IReactView;
-import com.reactnativenavigation.views.component.Renderable;
+import com.reactnativenavigation.interfaces.ScrollEventListener;
+import com.reactnativenavigation.viewcontrollers.IReactView;
+import com.reactnativenavigation.views.Renderable;
+import com.reactnativenavigation.views.element.Element;
 
-import androidx.annotation.RestrictTo;
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressLint("ViewConstructor")
 public class ReactView extends ReactRootView implements IReactView, Renderable {
@@ -27,6 +28,7 @@ public class ReactView extends ReactRootView implements IReactView, Renderable {
 	private final String componentName;
 	private boolean isAttachedToReactInstance = false;
     private final JSTouchDispatcher jsTouchDispatcher;
+    private ArrayList<Element> elements = new ArrayList<>();
 
     public ReactView(final Context context, ReactInstanceManager reactInstanceManager, String componentId, String componentName) {
 		super(context);
@@ -34,17 +36,14 @@ public class ReactView extends ReactRootView implements IReactView, Renderable {
 		this.componentId = componentId;
 		this.componentName = componentName;
 		jsTouchDispatcher = new JSTouchDispatcher(this);
+		start();
 	}
 
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        start();
-    }
-
-    public void start() {
-        if (isAttachedToReactInstance) return;
-        isAttachedToReactInstance = true;
+	private void start() {
+		setEventListener(reactRootView -> {
+            reactRootView.setEventListener(null);
+            isAttachedToReactInstance = true;
+        });
 		final Bundle opts = new Bundle();
 		opts.putString("componentId", componentId);
 		startReactApplication(reactInstanceManager, componentName, opts);
@@ -65,17 +64,19 @@ public class ReactView extends ReactRootView implements IReactView, Renderable {
 		unmountReactApplication();
 	}
 
-	public void sendComponentStart(ComponentType type) {
+	@Override
+	public void sendComponentStart() {
         ReactContext currentReactContext = reactInstanceManager.getCurrentReactContext();
         if (currentReactContext != null) {
-            new EventEmitter(currentReactContext).emitComponentDidAppear(componentId, componentName, type);
+            new EventEmitter(currentReactContext).emitComponentDidAppear(componentId, componentName);
         }
 	}
 
-	public void sendComponentStop(ComponentType type) {
+	@Override
+	public void sendComponentStop() {
         ReactContext currentReactContext = reactInstanceManager.getCurrentReactContext();
         if (currentReactContext != null) {
-            new EventEmitter(currentReactContext).emitComponentDidDisappear(componentId, componentName, type);
+            new EventEmitter(currentReactContext).emitComponentDidDisappear(componentId, componentName);
         }
 	}
 
@@ -110,5 +111,18 @@ public class ReactView extends ReactRootView implements IReactView, Renderable {
     @RestrictTo(RestrictTo.Scope.TESTS)
     public String getComponentName() {
         return componentName;
+    }
+
+    public void registerElement(Element element) {
+        elements.add(element);
+    }
+
+    public void unregisterElement(Element element) {
+        elements.remove(element);
+    }
+
+    @Override
+    public List<Element> getElements() {
+        return elements;
     }
 }

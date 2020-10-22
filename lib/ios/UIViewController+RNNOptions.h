@@ -6,32 +6,41 @@
 
 @interface UIViewController (RNNOptions)
 
-- (void)setBackgroundImage:(UIImage * _Nullable)backgroundImage;
+- (void)rnn_setBackgroundImage:(UIImage *)backgroundImage;
 
-- (void)setSearchBarWithPlaceholder:(NSString * _Nullable)placeholder
-			hideTopBarOnFocus:(BOOL)hideNavBarOnFocusSearchBar
-			hideOnScroll:(BOOL)searchBarHiddenWhenScrolling
-			obscuresBackgroundDuringPresentation:(BOOL)obscuresBackgroundDuringPresentation
-			backgroundColor:(nullable UIColor *)backgroundColor
-			tintColor:(nullable UIColor *)tintColor;
+- (void)rnn_setModalPresentationStyle:(UIModalPresentationStyle)modalPresentationStyle;
 
-- (void)setSearchBarHiddenWhenScrolling:(BOOL)searchBarHidden;
+- (void)rnn_setModalTransitionStyle:(UIModalTransitionStyle)modalTransitionStyle;
 
-- (void)setTabBarItemBadgeColor:(UIColor * _Nullable)badgeColor;
+- (void)rnn_setSearchBarWithPlaceholder:(NSString *)placeholder hideNavBarOnFocusSearchBar:(BOOL)hideNavBarOnFocusSearchBar;
 
-- (void)setTabBarItemBadge:(NSString * _Nullable)badge;
+- (void)rnn_setSearchBarHiddenWhenScrolling:(BOOL)searchBarHidden;
 
-- (void)setTopBarPrefersLargeTitle:(BOOL)prefersLargeTitle;
+- (void)rnn_setDrawBehindTopBar:(BOOL)drawBehind;
 
-- (void)setNavigationItemTitle:(NSString * _Nullable)title;
+- (void)rnn_setDrawBehindTabBar:(BOOL)drawBehindTabBar;
 
-- (void)setStatusBarStyle:(NSString * _Nullable)style animated:(BOOL)animated;
+- (void)rnn_setTabBarItemBadgeColor:(UIColor *)badgeColor;
 
-- (void)setStatusBarBlur:(BOOL)blur;
+- (void)rnn_setTabBarItemBadge:(NSString *)badge;
 
-- (void)setBackButtonVisible:(BOOL)visible;
+- (void)rnn_setTopBarPrefersLargeTitle:(BOOL)prefersLargeTitle;
 
-- (void)setBackgroundColor:(UIColor * _Nullable)backgroundColor;
+- (void)rnn_setNavigationItemTitle:(NSString *)title;
+
+- (void)rnn_setStatusBarStyle:(NSString *)style animated:(BOOL)animated;
+
+- (void)rnn_setStatusBarBlur:(BOOL)blur;
+
+- (void)rnn_setBackButtonVisible:(BOOL)visible;
+
+- (void)rnn_setBackgroundColor:(UIColor *)backgroundColor;
+
+- (void)rnn_setInterceptTouchOutside:(BOOL)interceptTouchOutside;
+
+- (void)rnn_setBackButtonIcon:(UIImage *)icon withColor:(UIColor *)color title:(NSString *)title;
+
+- (void)applyBackButton:(RNNBackButtonOptions *)backButton;
 
 - (BOOL)isModal;
 

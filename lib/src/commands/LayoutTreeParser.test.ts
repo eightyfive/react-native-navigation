@@ -1,4 +1,4 @@
-import keys from 'lodash/keys';
+import * as _ from 'lodash';
 import { LayoutTreeParser } from './LayoutTreeParser';
 import { LayoutType } from './LayoutType';
 import { Options } from '../interfaces/Options';
@@ -28,9 +28,9 @@ describe('LayoutTreeParser', () => {
         data: {
           name: 'MyReactComponent',
           options: LayoutExamples.options,
-          passProps: LayoutExamples.passProps,
+          passProps: LayoutExamples.passProps
         },
-        children: [],
+        children: []
       });
     });
 
@@ -41,9 +41,9 @@ describe('LayoutTreeParser', () => {
         data: {
           name: 'MyReactComponent',
           options: LayoutExamples.options,
-          passProps: LayoutExamples.passProps,
+          passProps: LayoutExamples.passProps
         },
-        children: [],
+        children: []
       });
     });
 
@@ -51,14 +51,14 @@ describe('LayoutTreeParser', () => {
       const result = uut.parse({
         component: {
           name: 'MyScreen',
-          passProps: LayoutExamples.passProps,
-        },
+          passProps: LayoutExamples.passProps
+        }
       });
       expect(result).toEqual({
         id: 'myUniqueId',
         type: LayoutType.Component,
         data: { name: 'MyScreen', passProps: LayoutExamples.passProps },
-        children: [],
+        children: []
       });
       expect(result.data.passProps).toBe(LayoutExamples.passProps);
     });
@@ -68,28 +68,28 @@ describe('LayoutTreeParser', () => {
         id: 'myUniqueId',
         type: LayoutType.Stack,
         data: {
-          options: LayoutExamples.options,
+          options: LayoutExamples.options
         },
         children: [
           {
             id: 'myUniqueId',
             type: LayoutType.Component,
             data: { name: 'MyReactComponent1' },
-            children: [],
+            children: []
           },
           {
             id: 'myUniqueId',
             type: LayoutType.Component,
             data: { name: 'MyReactComponent2', options: LayoutExamples.options },
-            children: [],
-          },
-        ],
+            children: []
+          }
+        ]
       });
     });
 
     it('bottom tabs', () => {
       const result = uut.parse(LayoutExamples.bottomTabs);
-      expect(keys(result)).toEqual(['id', 'type', 'data', 'children']);
+      expect(_.keys(result)).toEqual(['id', 'type', 'data', 'children']);
       expect(result.id).toEqual('myUniqueId');
       expect(result.type).toEqual(LayoutType.BottomTabs);
       expect(result.data).toEqual({});
@@ -101,7 +101,7 @@ describe('LayoutTreeParser', () => {
 
     it('side menus', () => {
       const result = uut.parse(LayoutExamples.sideMenu);
-      expect(keys(result)).toEqual(['id', 'type', 'data', 'children']);
+      expect(_.keys(result)).toEqual(['id', 'type', 'data', 'children']);
       expect(result.id).toEqual('myUniqueId');
       expect(result.type).toEqual(LayoutType.SideMenuRoot);
       expect(result.data).toEqual({});
@@ -119,7 +119,7 @@ describe('LayoutTreeParser', () => {
 
     it('top tabs', () => {
       const result = uut.parse(LayoutExamples.topTabs);
-      expect(keys(result)).toEqual(['id', 'type', 'data', 'children']);
+      expect(_.keys(result)).toEqual(['id', 'type', 'data', 'children']);
       expect(result.id).toEqual('myUniqueId');
       expect(result.type).toEqual(LayoutType.TopTabs);
       expect(result.data).toEqual({ options: LayoutExamples.options });
@@ -182,46 +182,45 @@ const passProps = {
   strProp: 'string prop',
   numProp: 12345,
   objProp: { inner: { foo: 'bar' } },
-  fnProp: () => 'Hello from a function',
+  fnProp: () => 'Hello from a function'
 };
 
 const options: Options = {
   topBar: {
     title: {
-      text: 'Hello1',
-    },
-  },
+      text: 'Hello1'
+    }
+  }
 };
 
 const optionsSplitView: Options = {
   topBar: {
     title: {
       text: 'Hello1',
-    },
+    }
   },
   splitView: {
     displayMode: 'auto',
     primaryEdge: 'leading',
     minWidth: 150,
-    maxWidth: 300,
-    primaryBackgroundStyle: 'sidebar',
-  },
+    maxWidth: 300
+  }
 };
 
 const singleComponent = {
   component: {
     name: 'MyReactComponent',
     options,
-    passProps,
-  },
+    passProps
+  }
 };
 
 const externalComponent = {
   externalComponent: {
     name: 'MyReactComponent',
     options,
-    passProps,
-  },
+    passProps
+  }
 };
 
 const stackWithTopBar = {
@@ -229,18 +228,18 @@ const stackWithTopBar = {
     children: [
       {
         component: {
-          name: 'MyReactComponent1',
-        },
+          name: 'MyReactComponent1'
+        }
       },
       {
         component: {
           name: 'MyReactComponent2',
-          options,
-        },
-      },
+          options
+        }
+      }
     ],
-    options,
-  },
+    options
+  }
 };
 
 const bottomTabs = {
@@ -250,26 +249,26 @@ const bottomTabs = {
       stackWithTopBar,
       {
         component: {
-          name: 'MyReactComponent1',
-        },
-      },
-    ],
-  },
+          name: 'MyReactComponent1'
+        }
+      }
+    ]
+  }
 };
 
 const sideMenu = {
   sideMenu: {
     left: singleComponent,
     center: stackWithTopBar,
-    right: singleComponent,
-  },
+    right: singleComponent
+  }
 };
 
 const topTabs = {
   topTabs: {
     children: [singleComponent, singleComponent, singleComponent, singleComponent, stackWithTopBar],
-    options,
-  },
+    options
+  }
 };
 
 const complexLayout: Layout = {
@@ -282,13 +281,13 @@ const complexLayout: Layout = {
           stackWithTopBar,
           {
             stack: {
-              children: [singleComponent, singleComponent, singleComponent, singleComponent],
-            },
-          },
-        ],
-      },
-    },
-  },
+              children: [singleComponent, singleComponent, singleComponent, singleComponent]
+            }
+          }
+        ]
+      }
+    }
+  }
 };
 
 const splitView: Layout = {
@@ -296,12 +295,12 @@ const splitView: Layout = {
     master: {
       stack: {
         children: [singleComponent],
-        options,
-      },
+        options
+      }
     },
     detail: stackWithTopBar,
-    options: optionsSplitView,
-  },
+    options: optionsSplitView
+  }
 };
 
 const LayoutExamples = {
@@ -314,5 +313,5 @@ const LayoutExamples = {
   topTabs,
   complexLayout,
   externalComponent,
-  splitView,
+  splitView
 };

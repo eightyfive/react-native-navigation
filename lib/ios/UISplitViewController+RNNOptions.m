@@ -16,11 +16,13 @@
 }
 
 - (void)rnn_setPrimaryEdge:(NSString *)primaryEdge {
-    if ([primaryEdge isEqualToString:@"trailing"]) {
-        self.primaryEdge = UISplitViewControllerPrimaryEdgeTrailing;
-    } else {
-        self.primaryEdge = UISplitViewControllerPrimaryEdgeLeading;
-    }
+	if (@available(iOS 11.0, *)) {
+		if ([primaryEdge isEqualToString:@"trailing"]) {
+			self.primaryEdge = UISplitViewControllerPrimaryEdgeTrailing;
+		} else {
+			self.primaryEdge = UISplitViewControllerPrimaryEdgeLeading;
+		}
+	}
 }
 
 - (void)rnn_setMinWidth:(Number *)minWidth {
@@ -32,14 +34,6 @@
 - (void)rnn_setMaxWidth:(Number *)maxWidth {
 	if (maxWidth.hasValue) {
 		[self setMaximumPrimaryColumnWidth:[[maxWidth get] doubleValue]];
-	}
-}
-
-- (void)rnn_setPrimaryBackgroundStyle:(NSString *)style {
-	if (@available(iOS 13.0, *)) {
-		if ([style isEqualToString:@"sidebar"]) {
-			[self setPrimaryBackgroundStyle:UISplitViewControllerBackgroundStyleSidebar];
-		}
 	}
 }
 

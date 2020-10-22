@@ -24,6 +24,7 @@
 	self.endY = [RNNUtils getDoubleOrKey:transition[@"y"] withKey:@"to" withDefault:0];
 	self.fromId = [transition objectForKey:@"fromId"];
 	self.toId = [transition objectForKey:@"toId"];
+	self.isSharedElementTransition = [[transition objectForKey:@"type"] isEqualToString:@"sharedElement"];
 	self.interpolation = [self animationOptionsFromString:transition[@"interpolation"]];
 	
 	
@@ -44,6 +45,7 @@
 	self.endY = [RNNUtils getDoubleOrKey:transition[@"y"] withKey:@"to" withDefault:0];
 	self.fromId = [transition objectForKey:@"fromId"];
 	self.toId = [transition objectForKey:@"toId"];
+	self.isSharedElementTransition = [[transition objectForKey:@"type"] isEqualToString:@"sharedElement"];
 	self.interpolation = [self animationOptionsFromString:transition[@"interpolation"]];
 }
 
@@ -57,13 +59,16 @@
 	return UIViewAnimationOptionCurveEaseInOut;
 }
 
-- (CGPoint)startPoint {
-    return CGPointMake(self.startX, self.startY);
+- (void)setupInitialTransitionForView:(UIView*)view {
+	_initialFrame = view.frame;
+	view.alpha = self.startAlpha;
+	view.frame = CGRectMake(_initialFrame.origin.x + self.startX, _initialFrame.origin.y + self.startY, view.frame.size.width, view.frame.size.height);
 }
 
-- (CGPoint)endPoint {
-    return CGPointMake(self.endX, self.endY);
+- (void)completeTransitionForView:(UIView*)view {
+	view.alpha = self.endAlpha;
+	view.frame = CGRectMake(_initialFrame.origin.x + self.endX, _initialFrame.origin.y + self.endY, view.frame.size.width, view.frame.size.height);
+	[view layoutSubviews];
 }
-
 
 @end

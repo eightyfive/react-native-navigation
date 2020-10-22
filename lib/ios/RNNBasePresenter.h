@@ -1,21 +1,20 @@
 #import "RNNNavigationOptions.h"
-#import "RNNReactComponentRegistry.h"
 
 typedef void (^RNNReactViewReadyCompletionBlock)(void);
 
 @interface RNNBasePresenter : NSObject
 
-@property(nonatomic, weak, setter=bindViewController:) UIViewController* boundViewController;
+@property(nonatomic, weak) id boundViewController;
 
 @property(nonatomic, strong) NSString *boundComponentId;
 
-@property(nonatomic, strong) RNNNavigationOptions* defaultOptions;
-
-@property(nonatomic, strong) RNNReactComponentRegistry* componentRegistry;
+@property(nonatomic, strong) RNNNavigationOptions * defaultOptions;
 
 - (instancetype)initWithDefaultOptions:(RNNNavigationOptions *)defaultOptions;
 
-- (instancetype)initWithComponentRegistry:(RNNReactComponentRegistry *)componentRegistry defaultOptions:(RNNNavigationOptions *)defaultOptions;
+- (void)bindViewController:(UIViewController *)boundViewController;
+
+- (void)setDefaultOptions:(RNNNavigationOptions *)defaultOptions;
 
 - (void)applyOptionsOnInit:(RNNNavigationOptions *)initialOptions;
 
@@ -25,28 +24,17 @@ typedef void (^RNNReactViewReadyCompletionBlock)(void);
 
 - (void)applyOptionsOnWillMoveToParentViewController:(RNNNavigationOptions *)options;
 
-- (void)mergeOptions:(RNNNavigationOptions *)options resolvedOptions:(RNNNavigationOptions *)resolvedOptions;
+- (void)applyDotIndicator:(UIViewController *)child;
+
+- (void)mergeOptions:(RNNNavigationOptions *)newOptions currentOptions:(RNNNavigationOptions *)currentOptions;
 
 - (void)renderComponents:(RNNNavigationOptions *)options perform:(RNNReactViewReadyCompletionBlock)readyBlock;
 
 - (void)viewDidLayoutSubviews;
 
-- (void)componentDidAppear;
+- (UIStatusBarStyle)getStatusBarStyle:(RNNNavigationOptions *)resolvedOptions;
 
-- (void)componentDidDisappear;
+- (UIInterfaceOrientationMask)getOrientation:(RNNNavigationOptions *)options;
 
-- (UINavigationItem *)currentNavigationItem;
-
-- (void)willMoveToParentViewController:(UIViewController *)parent;
-
-- (UIStatusBarStyle)getStatusBarStyle;
-
-- (UIInterfaceOrientationMask)getOrientation;
-
-- (BOOL)getStatusBarVisibility;
-
-- (BOOL)hidesBottomBarWhenPushed;
-
-- (BOOL)prefersHomeIndicatorAutoHidden;
-
+- (BOOL)isStatusBarVisibility:(UINavigationController *)stack resolvedOptions:(RNNNavigationOptions *)resolvedOptions;
 @end

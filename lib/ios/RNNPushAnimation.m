@@ -9,16 +9,15 @@
 }
 
 - (NSTimeInterval)transitionDuration:(id <UIViewControllerContextTransitioning>)transitionContext {
-	return self.screenTransition.maxDuration;
+	return self.screenTransition.maxDuration / 1000;
 }
 
 - (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
-    UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
-	UIView* fromView = [transitionContext viewForKey:UITransitionContextFromViewKey];
-	UIView* toView = [transitionContext viewForKey:UITransitionContextToViewKey];
+	UIViewController* fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
+	UIViewController* toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
 	
-	[[transitionContext containerView] addSubview:fromView];
-	[[transitionContext containerView] addSubview:toView];
+	[[transitionContext containerView] addSubview:fromViewController.view];
+	[[transitionContext containerView] addSubview:toViewController.view];
 	
 	[CATransaction begin];
 	[CATransaction setCompletionBlock:^{
@@ -41,7 +40,7 @@
 	[view.layer addAnimation:animation forKey:animationName];
 }
 
-- (void)animateElement:(ElementTransitionOptions *)element view:(UIView *)view elementName:(NSString *)elementName {
+- (void)animateElement:(RNNElementTransitionOptions *)element view:(UIView *)view elementName:(NSString *)elementName {
 	[self animationWithKeyPath:@"position.x" from:@(view.layer.position.x + [element.x.from getWithDefaultValue:0]) to:@(view.layer.position.x + [element.x.to getWithDefaultValue:0]) duration:[element.x.duration getWithDefaultValue:1] forView:view animationName:@"element.position.x"];
 	[self animationWithKeyPath:@"position.y" from:@(view.layer.position.y + [element.y.from getWithDefaultValue:0]) to:@(view.layer.position.y + [element.y.to getWithDefaultValue:0]) duration:[element.y.duration getWithDefaultValue:1] forView:view animationName:[NSString stringWithFormat:@"%@.position.y", elementName]];
 	[self animationWithKeyPath:@"opacity" from:@([element.alpha.from getWithDefaultValue:1]) to:@([element.alpha.to getWithDefaultValue:1]) duration:[element.alpha.duration getWithDefaultValue:1] forView:view animationName:[NSString stringWithFormat:@"%@.alpha", elementName]];

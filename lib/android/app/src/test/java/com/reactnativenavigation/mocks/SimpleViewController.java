@@ -2,26 +2,25 @@ package com.reactnativenavigation.mocks;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.MotionEvent;
+import android.widget.RelativeLayout;
 
 import com.facebook.react.ReactInstanceManager;
-import com.reactnativenavigation.viewcontrollers.viewcontroller.ScrollEventListener;
-import com.reactnativenavigation.options.Options;
-import com.reactnativenavigation.viewcontrollers.component.ComponentPresenterBase;
-import com.reactnativenavigation.viewcontrollers.viewcontroller.Presenter;
+import com.reactnativenavigation.interfaces.ScrollEventListener;
+import com.reactnativenavigation.parse.Options;
+import com.reactnativenavigation.presentation.Presenter;
 import com.reactnativenavigation.react.ReactView;
-import com.reactnativenavigation.viewcontrollers.child.ChildController;
-import com.reactnativenavigation.viewcontrollers.child.ChildControllersRegistry;
-import com.reactnativenavigation.views.component.ReactComponent;
+import com.reactnativenavigation.utils.ViewUtils;
+import com.reactnativenavigation.viewcontrollers.ChildController;
+import com.reactnativenavigation.viewcontrollers.ChildControllersRegistry;
+import com.reactnativenavigation.views.ReactComponent;
+import com.reactnativenavigation.views.topbar.TopBar;
 
 import org.mockito.Mockito;
 
-import androidx.annotation.NonNull;
-
-import static com.reactnativenavigation.utils.ObjectUtils.perform;
-
 public class SimpleViewController extends ChildController<SimpleViewController.SimpleView> {
-    private ComponentPresenterBase presenter = new ComponentPresenterBase();
+
 
     public SimpleViewController(Activity activity, ChildControllersRegistry childRegistry, String id, Options options) {
         this(activity, childRegistry, id, new Presenter(activity, new Options()), options);
@@ -32,7 +31,7 @@ public class SimpleViewController extends ChildController<SimpleViewController.S
     }
 
     @Override
-    public SimpleView createView() {
+    protected SimpleView createView() {
         return new SimpleView(getActivity());
     }
 
@@ -43,36 +42,45 @@ public class SimpleViewController extends ChildController<SimpleViewController.S
 
     @Override
     public void destroy() {
-        if (!isDestroyed()) performOnParentController(parent -> parent.onChildDestroyed(this));
+        if (!isDestroyed()) performOnParentController(parent -> parent.onChildDestroyed(getView()));
         super.destroy();
     }
 
-    @NonNull
     @Override
     public String toString() {
         return "SimpleViewController " + getId();
     }
 
     @Override
-    public int getTopInset() {
-        int statusBarInset = resolveCurrentOptions().statusBar.isHiddenOrDrawBehind() ? 0 : 63;
-        return statusBarInset + perform(getParentController(), 0, p -> p.getTopInset(this));
-    }
-
-    @Override
-    public void applyBottomInset() {
-        if (view != null) presenter.applyBottomInset(view, getBottomInset());
-    }
-
-    @Override
-    public String getCurrentComponentName() {
-        return null;
+    public void mergeOptions(Options options) {
+        performOnParentController(parentController -> parentController.mergeChildOptions(options, this, getView()));
+        super.mergeOptions(options);
     }
 
     public static class SimpleView extends ReactView implements ReactComponent {
 
         public SimpleView(@NonNull Context context) {
             super(context, Mockito.mock(ReactInstanceManager.class), "compId", "compName");
+        }
+
+        @Override
+        public void drawBehindTopBar() {
+            if (getLayoutParams() instanceof RelativeLayout.LayoutParams) {
+                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) getLayoutParams();
+                if (layoutParams.topMargin == 0) return;
+                layoutParams.topMargin = 0;
+                setLayoutParams(layoutParams);
+            }
+        }
+
+        @Override
+        public void drawBelowTopBar(TopBar topBar) {
+            if (getLayoutParams() instanceof RelativeLayout.LayoutParams) {
+                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) getLayoutParams();
+                if (layoutParams.topMargin == ViewUtils.getHeight(topBar)) return;
+                layoutParams.topMargin = ViewUtils.getHeight(topBar);
+//                setLayoutParams(layoutParams);
+            }
         }
 
         @Override
@@ -92,6 +100,16 @@ public class SimpleViewController extends ChildController<SimpleViewController.S
 
         @Override
         public void destroy() {
+
+        }
+
+        @Override
+        public void sendComponentStart() {
+
+        }
+
+        @Override
+        public void sendComponentStop() {
 
         }
 

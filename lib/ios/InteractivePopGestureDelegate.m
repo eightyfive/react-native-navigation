@@ -3,13 +3,8 @@
 
 @implementation InteractivePopGestureDelegate
 
-- (instancetype)init {
-    self = [super init];
-    _enabled = YES;
-    return self;
-}
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-	if (self.navigationController.viewControllers.count < 2 || !_enabled) {
+	if (self.navigationController.viewControllers.count < 2) {
 		return NO;
 	} else if (self.navigationController.navigationBarHidden) {
 		return YES;

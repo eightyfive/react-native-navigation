@@ -1,10 +1,10 @@
 #import "RNNNavigationOptions.h"
 #import <React/RCTConvert.h>
-#import "RNNStackController.h"
-#import "RNNBottomTabsController.h"
+#import "RNNNavigationController.h"
+#import "RNNTabBarController.h"
 #import "RNNTopBarOptions.h"
 #import "RNNSideMenuController.h"
-#import "RNNComponentViewController.h"
+#import "RNNRootViewController.h"
 #import "RNNSplitViewController.h"
 #import "RNNNavigationButtons.h"
 #import "RNNSplitViewOptions.h"
@@ -24,13 +24,11 @@
 	self.sideMenu = [[RNNSideMenuOptions alloc] initWithDict:dict[@"sideMenu"]];
 	self.splitView = [[RNNSplitViewOptions alloc] initWithDict:dict[@"splitView"]];
 	self.overlay = [[RNNOverlayOptions alloc] initWithDict:dict[@"overlay"]];
+	self.customTransition = [[RNNSharedElementAnimationOptions alloc] initWithDict:dict[@"customTransition"]];
 	self.animations = [[RNNAnimationsOptions alloc] initWithDict:dict[@"animations"]];
 	self.statusBar = [[RNNStatusBarOptions alloc] initWithDict:dict[@"statusBar"]];
 	self.preview = [[RNNPreviewOptions alloc] initWithDict:dict[@"preview"]];
 	self.layout = [[RNNLayoutOptions alloc] initWithDict:dict[@"layout"]];
-    self.modal = [[RNNModalOptions alloc] initWithDict:dict[@"modal"]];
-	self.deprecations = [[DeprecationOptions alloc] initWithDict:dict[@"deprecations"]];
-	self.window = [[WindowOptions alloc] initWithDict:dict[@"window"]];
 	
 	self.popGesture = [[Bool alloc] initWithValue:dict[@"popGesture"]];
 	
@@ -40,10 +38,6 @@
 	self.modalTransitionStyle = [[Text alloc] initWithValue:dict[@"modalTransitionStyle"]];
 	
 	return self;
-}
-
-+ (instancetype)emptyOptions {
-    return [[RNNNavigationOptions alloc] initEmptyOptions];
 }
 
 - (instancetype)initEmptyOptions {

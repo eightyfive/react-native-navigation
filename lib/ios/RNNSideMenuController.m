@@ -3,7 +3,6 @@
 
 @interface RNNSideMenuController ()
 
-@property (nonatomic, strong) NSArray *childViewControllers;
 @property (readwrite) RNNSideMenuChildVC *center;
 @property (readwrite) RNNSideMenuChildVC *left;
 @property (readwrite) RNNSideMenuChildVC *right;
@@ -12,13 +11,12 @@
 
 @implementation RNNSideMenuController
 
-- (instancetype)initWithLayoutInfo:(RNNLayoutInfo *)layoutInfo creator:(id<RNNComponentViewCreator>)creator childViewControllers:(NSArray *)childViewControllers options:(RNNNavigationOptions *)options defaultOptions:(RNNNavigationOptions *)defaultOptions presenter:(RNNBasePresenter *)presenter eventEmitter:(RNNEventEmitter *)eventEmitter {
-	self = [super init];
-
-    self.childViewControllers = childViewControllers;
+- (instancetype)initWithLayoutInfo:(RNNLayoutInfo *)layoutInfo creator:(id<RNNRootViewCreator>)creator childViewControllers:(NSArray *)childViewControllers options:(RNNNavigationOptions *)options defaultOptions:(RNNNavigationOptions *)defaultOptions presenter:(RNNBasePresenter *)presenter eventEmitter:(RNNEventEmitter *)eventEmitter {
+	[self setControllers:childViewControllers];
+	self = [super initWithCenterViewController:self.center leftDrawerViewController:self.left rightDrawerViewController:self.right];
 	
 	self.presenter = presenter;
-    [self.presenter bindViewController:self];
+	[self.presenter bindViewController:self];
 	
 	self.defaultOptions = defaultOptions;
 	self.options = options;
@@ -36,21 +34,8 @@
 	return self;
 }
 
-- (void)loadView {
-    [super loadView];
-    [self setCenterViewController:self.center];
-    [self setLeftDrawerViewController:self.left];
-    [self setRightDrawerViewController:self.right];
-}
-
-- (void)render {
-    [super render];
-    UIViewController *currentChild = self.getCurrentChild;
-    for (UIViewController *vc in self.childViewControllers) {
-        if (vc != currentChild) {
-            [vc render];
-        }
-    }
+- (void)setDefaultOptions:(RNNNavigationOptions *)defaultOptions {
+	[self.presenter setDefaultOptions:defaultOptions];
 }
 
 - (void)setAnimationType:(NSString *)animationType {
@@ -107,9 +92,8 @@
 	}
 }
 
--(void)setChildViewControllers:(NSArray *)childViewControllers {
-    _childViewControllers = childViewControllers;
-	for (id controller in childViewControllers) {
+-(void)setControllers:(NSArray*)controllers {
+	for (id controller in controllers) {
 		if ([controller isKindOfClass:[RNNSideMenuChildVC class]]) {
 			RNNSideMenuChildVC *child = (RNNSideMenuChildVC*)controller;
 
@@ -122,12 +106,18 @@
 			else if(child.type == RNNSideMenuChildTypeRight) {
 				self.right = child;
 			}
+
+			[self addChildViewController:child];
 		}
 
 		else {
 			@throw [NSException exceptionWithName:@"UnknownSideMenuControllerType" reason:[@"Unknown side menu type " stringByAppendingString:[controller description]] userInfo:nil];
 		}
 	}
+}
+
+- (UIStatusBarStyle)preferredStatusBarStyle {
+	return self.openedViewController.preferredStatusBarStyle;
 }
 
 - (UIViewController<RNNLayoutProtocol> *)getCurrentChild {
@@ -155,26 +145,12 @@
     return options;
 }
 
-# pragma mark - UIViewController overrides
-
-- (void)willMoveToParentViewController:(UIViewController *)parent {
-    [self.presenter willMoveToParentViewController:parent];
-}
-
-- (UIStatusBarStyle)preferredStatusBarStyle {
-    return [self.presenter getStatusBarStyle];
-}
-
-- (BOOL)prefersStatusBarHidden {
-    return [self.presenter getStatusBarVisibility];
-}
-
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return [self.presenter getOrientation];
-}
-
-- (BOOL)hidesBottomBarWhenPushed {
-    return [self.presenter hidesBottomBarWhenPushed];
+- (CGFloat)getTopBarHeight {
+    for(UIViewController * child in [self childViewControllers]) {
+        CGFloat childTopBarHeight = [child getTopBarHeight];
+        if (childTopBarHeight > 0) return childTopBarHeight;
+    }
+    return [super getTopBarHeight];
 }
 
 @end

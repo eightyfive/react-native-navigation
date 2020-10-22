@@ -1,14 +1,13 @@
 #import <Foundation/Foundation.h>
-#import "RNNReactButtonView.h"
-#import "RNNReactTitleView.h"
+#import "RNNReactView.h"
 #import "RNNComponentOptions.h"
-#import "RNNComponentViewCreator.h"
+#import "RNNRootViewCreator.h"
 
 @interface RNNReactComponentRegistry : NSObject
 
-- (instancetype)initWithCreator:(id<RNNComponentViewCreator>)creator;
+- (instancetype)initWithCreator:(id<RNNRootViewCreator>)creator;
 
-- (RNNReactButtonView *)createComponentIfNotExists:(RNNComponentOptions *)component parentComponentId:(NSString *)parentComponentId componentType:(RNNComponentType)componentType reactViewReadyBlock:(RNNReactViewReadyCompletionBlock)reactViewReadyBlock;
+- (RNNReactView *)createComponentIfNotExists:(RNNComponentOptions *)component parentComponentId:(NSString *)parentComponentId reactViewReadyBlock:(RNNReactViewReadyCompletionBlock)reactViewReadyBlock;
 
 - (void)removeComponent:(NSString *)componentId;
 

@@ -9,9 +9,10 @@
 @property (nonatomic, strong) Color* color;
 @property (nonatomic, strong) Text* fontFamily;
 @property (nonatomic, strong) Text* fontWeight;
+
 @property (nonatomic, strong) RNNComponentOptions* component;
 @property (nonatomic, strong) Text* componentAlignment;
 
-- (BOOL)hasValue;
+@property (nonatomic, strong) NSDictionary* fontAttributes;
 
 @end

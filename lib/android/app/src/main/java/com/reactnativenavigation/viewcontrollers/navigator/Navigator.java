@@ -1,33 +1,32 @@
 package com.reactnativenavigation.viewcontrollers.navigator;
 
 import android.app.Activity;
-import android.view.View;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
-import com.facebook.react.ReactInstanceManager;
-import com.reactnativenavigation.options.Options;
-import com.reactnativenavigation.viewcontrollers.overlay.OverlayManager;
-import com.reactnativenavigation.viewcontrollers.viewcontroller.Presenter;
-import com.reactnativenavigation.viewcontrollers.viewcontroller.RootPresenter;
-import com.reactnativenavigation.react.events.EventEmitter;
-import com.reactnativenavigation.react.CommandListener;
-import com.reactnativenavigation.react.CommandListenerAdapter;
+import com.reactnativenavigation.parse.Options;
+import com.reactnativenavigation.presentation.OverlayManager;
+import com.reactnativenavigation.presentation.Presenter;
+import com.reactnativenavigation.presentation.RootPresenter;
+import com.reactnativenavigation.react.EventEmitter;
+import com.reactnativenavigation.utils.CommandListener;
+import com.reactnativenavigation.utils.CommandListenerAdapter;
 import com.reactnativenavigation.utils.CompatUtils;
 import com.reactnativenavigation.utils.Functions.Func1;
-import com.reactnativenavigation.viewcontrollers.child.ChildControllersRegistry;
-import com.reactnativenavigation.viewcontrollers.parent.ParentController;
-import com.reactnativenavigation.viewcontrollers.viewcontroller.ViewController;
+import com.reactnativenavigation.viewcontrollers.ChildControllersRegistry;
+import com.reactnativenavigation.viewcontrollers.ParentController;
+import com.reactnativenavigation.viewcontrollers.ViewController;
 import com.reactnativenavigation.viewcontrollers.modal.ModalStack;
 import com.reactnativenavigation.viewcontrollers.stack.StackController;
+
+import com.facebook.react.ReactInstanceManager;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RestrictTo;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 public class Navigator extends ParentController {
 
@@ -36,9 +35,9 @@ public class Navigator extends ParentController {
     private final RootPresenter rootPresenter;
     private ViewController root;
     private ViewController previousRoot;
-    private final CoordinatorLayout rootLayout;
-    private final CoordinatorLayout modalsLayout;
-    private final CoordinatorLayout overlaysLayout;
+    private final FrameLayout rootLayout;
+    private final FrameLayout modalsLayout;
+    private final FrameLayout overlaysLayout;
     private ViewGroup contentLayout;
     private Options defaultOptions = new Options();
 
@@ -53,7 +52,7 @@ public class Navigator extends ParentController {
         return defaultOptions;
     }
 
-    CoordinatorLayout getRootLayout() {
+    FrameLayout getRootLayout() {
         return rootLayout;
     }
 
@@ -64,8 +63,8 @@ public class Navigator extends ParentController {
     public void setContentLayout(ViewGroup contentLayout) {
         this.contentLayout = contentLayout;
         contentLayout.addView(rootLayout);
-        modalsLayout.setVisibility(View.GONE); contentLayout.addView(modalsLayout);
-        overlaysLayout.setVisibility(View.GONE); contentLayout.addView(overlaysLayout);
+        contentLayout.addView(modalsLayout);
+        contentLayout.addView(overlaysLayout);
     }
 
     public Navigator(final Activity activity, ChildControllersRegistry childRegistry, ModalStack modalStack, OverlayManager overlayManager, RootPresenter rootPresenter) {
@@ -73,9 +72,9 @@ public class Navigator extends ParentController {
         this.modalStack = modalStack;
         this.overlayManager = overlayManager;
         this.rootPresenter = rootPresenter;
-        rootLayout = new CoordinatorLayout(getActivity());
-        modalsLayout = new CoordinatorLayout(getActivity());
-        overlaysLayout = new CoordinatorLayout(getActivity());
+        rootLayout = new FrameLayout(getActivity());
+        modalsLayout = new FrameLayout(getActivity());
+        overlaysLayout = new FrameLayout(getActivity());
     }
 
     public void bindViews() {
@@ -86,7 +85,7 @@ public class Navigator extends ParentController {
 
     @NonNull
     @Override
-    public ViewGroup createView() {
+    protected ViewGroup createView() {
         return rootLayout;
     }
 
@@ -104,7 +103,7 @@ public class Navigator extends ParentController {
     }
 
     @Override
-    public ViewController getCurrentChild() {
+    protected ViewController getCurrentChild() {
         return root;
     }
 
@@ -116,7 +115,7 @@ public class Navigator extends ParentController {
 
     public void destroyViews() {
         modalStack.destroy();
-        overlayManager.destroy(overlaysLayout);
+        overlayManager.destroy();
         destroyRoot();
     }
 
@@ -144,10 +143,13 @@ public class Navigator extends ParentController {
         rootPresenter.setRoot(root, defaultOptions, new CommandListenerAdapter(commandListener) {
             @Override
             public void onSuccess(String childId) {
-                root.onViewDidAppear();
-                if (removeSplashView) contentLayout.removeViewAt(0);
-                destroyPreviousRoot();
+                if (removeSplashView) removePreviousContentView();
                 super.onSuccess(childId);
+                destroyPreviousRoot();
+            }
+
+            private void removePreviousContentView() {
+                contentLayout.removeViewAt(0);
             }
         }, reactInstanceManager);
     }
@@ -176,9 +178,9 @@ public class Navigator extends ParentController {
     }
 
     public void popTo(final String id, Options mergeOptions, CommandListener listener) {
-        ViewController<?> target = findController(id);
+        ViewController target = findController(id);
         if (target != null) {
-            target.performOnParentStack(stack -> stack.popTo(target, mergeOptions, listener));
+            target.performOnParentStack(stack -> ((StackController) stack).popTo(target, mergeOptions, listener));
         } else {
             listener.onError("Failed to execute stack command. Stack by " + id + " not found.");
         }
@@ -205,7 +207,7 @@ public class Navigator extends ParentController {
     }
 
     public void dismissOverlay(final String componentId, CommandListener listener) {
-        overlayManager.dismiss(overlaysLayout, componentId, listener);
+        overlayManager.dismiss(componentId, listener);
     }
 
     @Nullable
@@ -222,12 +224,12 @@ public class Navigator extends ParentController {
     }
 
     private void applyOnStack(String fromId, CommandListener listener, Func1<StackController> task) {
-        ViewController<?> from = findController(fromId);
+        ViewController from = findController(fromId);
         if (from != null) {
             if (from instanceof StackController) {
                 task.run((StackController) from);
             } else {
-                from.performOnParentStack(task);
+                from.performOnParentStack(stack -> task.run((StackController) stack) );
             }
         } else {
             listener.onError("Failed to execute stack command. Stack " + fromId + " not found.");
@@ -239,12 +241,7 @@ public class Navigator extends ParentController {
     }
 
     @RestrictTo(RestrictTo.Scope.TESTS)
-    CoordinatorLayout getModalsLayout() {
+    FrameLayout getModalsLayout() {
         return modalsLayout;
-    }
-
-    @RestrictTo(RestrictTo.Scope.TESTS)
-    CoordinatorLayout getOverlaysLayout() {
-        return overlaysLayout;
     }
 }

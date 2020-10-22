@@ -26,19 +26,13 @@
 
 - (void)dismissOverlay:(UIViewController*)viewController {
 	RNNOverlayWindow* overlayWindow = [self findWindowByRootViewController:viewController];
+	[overlayWindow.previousWindow makeKeyWindow];
 	[self detachOverlayWindow:overlayWindow];
-}
-
-- (void)dismissAllOverlays {
-    for (RNNOverlayWindow* overlayWindow  in [_overlayWindows reverseObjectEnumerator]) {
-        [self detachOverlayWindow:overlayWindow];
-    }
 }
 
 #pragma mark - private
 
-- (void)detachOverlayWindow:(RNNOverlayWindow *)overlayWindow {
-    [overlayWindow.previousWindow makeKeyWindow];
+- (void)detachOverlayWindow:(UIWindow *)overlayWindow {
 	[overlayWindow setHidden:YES];
 	[overlayWindow setRootViewController:nil];
 	[_overlayWindows removeObject:overlayWindow];

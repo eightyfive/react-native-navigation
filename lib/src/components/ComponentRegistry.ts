@@ -20,21 +20,15 @@ export class ComponentRegistry {
     reduxStore?: any
   ): ComponentProvider {
     const NavigationComponent = () => {
-      if (this.store.hasRegisteredWrappedComponent(componentName)) {
-        return this.store.getWrappedComponent(componentName);
-      } else {
-        const wrappedComponent = this.componentWrapper.wrap(
-          componentName.toString(),
-          componentProvider,
-          this.store,
-          this.componentEventsObserver,
-          concreteComponentProvider,
-          ReduxProvider,
-          reduxStore
-        );
-        this.store.setWrappedComponent(componentName, wrappedComponent);
-        return wrappedComponent;
-      }
+      return this.componentWrapper.wrap(
+        componentName.toString(),
+        componentProvider,
+        this.store,
+        this.componentEventsObserver,
+        concreteComponentProvider,
+        ReduxProvider,
+        reduxStore
+      );
     };
     this.store.setComponentClassForName(componentName.toString(), NavigationComponent);
     this.appRegistryService.registerComponent(componentName.toString(), NavigationComponent);

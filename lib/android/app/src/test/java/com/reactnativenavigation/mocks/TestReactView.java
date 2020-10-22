@@ -1,37 +1,22 @@
 package com.reactnativenavigation.mocks;
 
 import android.content.Context;
-import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.FrameLayout;
 
-import com.facebook.react.ReactInstanceManager;
-import com.reactnativenavigation.viewcontrollers.viewcontroller.ScrollEventListener;
-import com.reactnativenavigation.react.ReactView;
-import com.reactnativenavigation.react.events.ComponentType;
-import com.reactnativenavigation.viewcontrollers.viewcontroller.IReactView;
+import com.reactnativenavigation.interfaces.ScrollEventListener;
+import com.reactnativenavigation.viewcontrollers.IReactView;
+import com.reactnativenavigation.views.element.Element;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
 
-public class TestReactView extends ReactView implements IReactView {
+public class TestReactView extends FrameLayout implements IReactView {
 
     public TestReactView(@NonNull Context context) {
-        super(context, null, "", "");
-    }
-
-    @Override
-    public void startReactApplication(ReactInstanceManager reactInstanceManager, String moduleName, @Nullable Bundle initialProperties, @Nullable String initialUITemplate) {
-
-    }
-
-    @Override
-    public void sendComponentStart(ComponentType type) {
-
-    }
-
-    @Override
-    public void sendComponentStop(ComponentType type) {
-
+        super(context);
     }
 
     @Override
@@ -40,7 +25,22 @@ public class TestReactView extends ReactView implements IReactView {
     }
 
     @Override
+    public View asView() {
+        return this;
+    }
+
+    @Override
     public void destroy() {
+
+    }
+
+    @Override
+    public void sendComponentStart() {
+
+    }
+
+    @Override
+    public void sendComponentStop() {
 
     }
 
@@ -62,5 +62,10 @@ public class TestReactView extends ReactView implements IReactView {
     @Override
     public boolean isRendered() {
         return getChildCount() >= 1;
+    }
+
+    @Override
+    public List<Element> getElements() {
+        return Collections.EMPTY_LIST;
     }
 }

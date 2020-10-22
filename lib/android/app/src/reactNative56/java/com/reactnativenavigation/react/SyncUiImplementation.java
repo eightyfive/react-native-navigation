@@ -1,6 +1,6 @@
 package com.reactnativenavigation.react;
 
-import androidx.annotation.Nullable;
+import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;

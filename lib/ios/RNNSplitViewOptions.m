@@ -9,7 +9,6 @@
 	self.primaryEdge = dict[@"primaryEdge"];
 	self.minWidth = [NumberParser parse:dict key:@"minWidth"];
 	self.maxWidth = [NumberParser parse:dict key:@"maxWidth"];
-	self.primaryBackgroundStyle = dict[@"primaryBackgroundStyle"];
 	return self;	
 }
 

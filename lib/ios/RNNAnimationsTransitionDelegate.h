@@ -1,11 +1,11 @@
 #import <Foundation/Foundation.h>
-#import "TransitionOptions.h"
+#import "RNNScreenTransition.h"
 
 @interface RNNAnimationsTransitionDelegate : NSObject <UIViewControllerAnimatedTransitioning, UIViewControllerTransitioningDelegate>
 
-@property (nonatomic, strong) TransitionOptions* transitionOptions;
+@property (nonatomic, strong) RNNScreenTransition* screenTransition;
 @property (nonatomic) BOOL isDismiss;
 
-- (instancetype)initWithScreenTransition:(TransitionOptions *)transitionOptions isDismiss:(BOOL)isDismiss;
+- (instancetype)initWithScreenTransition:(RNNScreenTransition *)screenTransition isDismiss:(BOOL)isDismiss;
 
 @end

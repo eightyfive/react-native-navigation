@@ -2,17 +2,18 @@ package com.reactnativenavigation;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
-import com.reactnativenavigation.options.params.Bool;
+import com.reactnativenavigation.parse.params.Bool;
 import com.reactnativenavigation.utils.ViewUtils;
-import com.reactnativenavigation.viewcontrollers.viewcontroller.ViewController;
+import com.reactnativenavigation.viewcontrollers.ViewController;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.android.controller.ActivityController;
@@ -20,15 +21,11 @@ import org.robolectric.annotation.Config;
 
 import java.util.Arrays;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-
-import static com.reactnativenavigation.utils.CollectionUtils.*;
+import static com.reactnativenavigation.utils.CollectionUtils.forEach;
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricTestRunner.class)
-@Config(sdk = 28, application = TestApplication.class)
+@Config(sdk = 27, application = TestApplication.class)
 public abstract class BaseTest {
     @Before
     public void beforeEach() {
@@ -66,11 +63,6 @@ public abstract class BaseTest {
         assertThat(parent).isNotNull();
         assertThat(child).isNotNull();
         assertThat(ViewUtils.isChildOf(parent, child)).isFalse();
-    }
-
-    public void assertMatchParent(View view) {
-        assertThat(view.getLayoutParams().width).isEqualTo(ViewGroup.LayoutParams.MATCH_PARENT);
-        assertThat(view.getLayoutParams().height).isEqualTo(ViewGroup.LayoutParams.MATCH_PARENT);
     }
 
     protected void disablePushAnimation(ViewController... controllers) {
@@ -112,21 +104,7 @@ public abstract class BaseTest {
 
     protected void addToParent(Context context, ViewController... controllers) {
         for (ViewController controller : controllers) {
-            new CoordinatorLayout(context).addView(controller.getView());
+            new FrameLayout(context).addView(controller.getView());
         }
-    }
-
-    protected View mockView(Activity activity) {
-        View mock = Mockito.mock(View.class);
-        when(mock.getContext()).thenReturn(activity);
-        return mock;
-    }
-
-    protected void assertVisible(View view) {
-        assertThat(view.getVisibility()).isEqualTo(View.VISIBLE);
-    }
-
-    protected void assertGone(View view) {
-        assertThat(view.getVisibility()).isEqualTo(View.GONE);
     }
 }

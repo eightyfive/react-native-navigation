@@ -1,18 +1,21 @@
 #import <Foundation/Foundation.h>
+#import "RNNElementView.h"
 
 @interface RNNViewLocation : NSObject
 
 @property (nonatomic) CGRect fromFrame;
+@property (nonatomic) CGPoint fromCenter;
+@property (nonatomic) CGSize fromSize;
 @property (nonatomic) CGRect toFrame;
-@property (nonatomic) CGRect fromBounds;
-@property (nonatomic) CGRect toBounds;
-@property (nonatomic) CGFloat fromAngle;
-@property (nonatomic) CGFloat toAngle;
-@property (nonatomic) CGFloat fromCornerRadius;
-@property (nonatomic) CGFloat toCornerRadius;
-@property (nonatomic) CATransform3D fromTransform;
-@property (nonatomic) CATransform3D toTransform;
+@property (nonatomic) CGPoint toCenter;
+@property (nonatomic) CGSize toSize;
+@property (nonatomic) CGAffineTransform transform;
+@property (nonatomic) CGAffineTransform transformBack;
 
-- (instancetype)initWithFromElement:(UIView*)fromElement toElement:(UIView*)toElement;
+-(instancetype)initWithFromElement:(RNNElementView*)fromElement toElement:(RNNElementView*)toElement startPoint:(CGPoint)startPoint endPoint:(CGPoint)endPoint andVC:(UIViewController*)vc;
+
+-(CGRect)frameFromSuperViewController:(UIView*)view andVC:(UIViewController*)vc;
+
+-(CGPoint)centerFromSuperViewController:(UIView*)view andVC:(UIViewController*)vc;
 
 @end

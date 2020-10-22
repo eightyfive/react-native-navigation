@@ -23,14 +23,12 @@
 	self.drawBehind = [BoolParser parse:dict key:@"drawBehind"];
 	self.noBorder = [BoolParser parse:dict key:@"noBorder"];
 	self.animate = [BoolParser parse:dict key:@"animate"];
-    self.searchBar = [[RNNSearchBarOptions alloc] initWithDict:dict[@"searchBar"]];
+	self.searchBar = [BoolParser parse:dict key:@"searchBar"];
 	self.searchBarHiddenWhenScrolling = [BoolParser parse:dict key:@"searchBarHiddenWhenScrolling"];
 	self.hideNavBarOnFocusSearchBar = [BoolParser parse:dict key:@"hideNavBarOnFocusSearchBar"];
 	self.testID = [TextParser parse:dict key:@"testID"];
 	self.barStyle = [TextParser parse:dict key:@"barStyle"];
 	self.searchBarPlaceholder = [TextParser parse:dict key:@"searchBarPlaceholder"];
-	self.searchBarBackgroundColor = [ColorParser parse:dict key:@"searchBarBackgroundColor"];
-	self.searchBarTintColor = [ColorParser parse:dict key:@"searchBarTintColor"];
 	self.largeTitle = [[RNNLargeTitleOptions alloc] initWithDict:dict[@"largeTitle"]];
 	self.title = [[RNNTitleOptions alloc] initWithDict:dict[@"title"]];
 	self.subtitle = [[RNNSubtitleOptions alloc] initWithDict:dict[@"subtitle"]];
@@ -38,6 +36,7 @@
 	self.backButton = [[RNNBackButtonOptions alloc] initWithDict:dict[@"backButton"]];
 	self.leftButtonStyle = [[RNNButtonOptions alloc] initWithDict:dict[@"leftButtonStyle"]];
 	self.rightButtonStyle = [[RNNButtonOptions alloc] initWithDict:dict[@"rightButtonStyle"]];
+	self.component = [[RNNComponentOptions alloc] initWithDict:dict[@"component"]];
 	
 	if (self.leftButtonColor.hasValue) {
 		self.leftButtonStyle.color = self.leftButtonColor;
@@ -62,11 +61,5 @@
 	return self;
 }
 
-- (BOOL)shouldDrawBehind {
-    return [self.drawBehind getWithDefaultValue:NO] ||
-    [self.background.translucent getWithDefaultValue:NO] ||
-    ![self.visible getWithDefaultValue:YES] ||
-    [self.largeTitle.visible getWithDefaultValue:NO];
-}
 
 @end

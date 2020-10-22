@@ -1,8 +1,7 @@
 package com.reactnativenavigation.presentation;
 
 import com.reactnativenavigation.BaseTest;
-import com.reactnativenavigation.viewcontrollers.viewcontroller.ViewController;
-import com.reactnativenavigation.utils.RenderChecker;
+import com.reactnativenavigation.viewcontrollers.ViewController;
 
 import org.junit.Test;
 import org.mockito.Mockito;

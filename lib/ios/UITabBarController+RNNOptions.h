@@ -2,22 +2,20 @@
 
 @interface UITabBarController (RNNOptions)
 
-- (void)setCurrentTabIndex:(NSUInteger)currentTabIndex;
+- (void)rnn_setCurrentTabIndex:(NSUInteger)currentTabIndex;
 
-- (void)setCurrentTabID:(NSString *)tabID;
+- (void)rnn_setCurrentTabID:(NSString *)tabID;
 
-- (void)setTabBarTestID:(NSString *)testID;
+- (void)rnn_setTabBarTestID:(NSString *)testID;
 
-- (void)setTabBarStyle:(UIBarStyle)barStyle;
+- (void)rnn_setTabBarBackgroundColor:(UIColor *)backgroundColor;
 
-- (void)setTabBarTranslucent:(BOOL)translucent;
+- (void)rnn_setTabBarStyle:(UIBarStyle)barStyle;
 
-- (void)setTabBarHideShadow:(BOOL)hideShadow;
+- (void)rnn_setTabBarTranslucent:(BOOL)translucent;
 
-- (void)centerTabItems;
+- (void)rnn_setTabBarHideShadow:(BOOL)hideShadow;
 
-- (void)showTabBar:(BOOL)animated;
-
-- (void)hideTabBar:(BOOL)animated;
+- (void)rnn_setTabBarVisible:(BOOL)visible animated:(BOOL)animated;
 
 @end

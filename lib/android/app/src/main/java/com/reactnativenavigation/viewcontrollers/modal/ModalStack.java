@@ -1,23 +1,21 @@
 package com.reactnativenavigation.viewcontrollers.modal;
 
 import android.app.Activity;
+import android.support.annotation.RestrictTo;
 import android.view.ViewGroup;
 
-import com.reactnativenavigation.options.Options;
-import com.reactnativenavigation.react.events.EventEmitter;
-import com.reactnativenavigation.react.CommandListener;
-import com.reactnativenavigation.react.CommandListenerAdapter;
-import com.reactnativenavigation.viewcontrollers.viewcontroller.ViewController;
+import com.reactnativenavigation.anim.ModalAnimator;
+import com.reactnativenavigation.parse.Options;
+import com.reactnativenavigation.react.EventEmitter;
+import com.reactnativenavigation.utils.CommandListener;
+import com.reactnativenavigation.utils.CommandListenerAdapter;
+import com.reactnativenavigation.viewcontrollers.ViewController;
 
 import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.List;
 
-import androidx.annotation.Nullable;
-import androidx.annotation.RestrictTo;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-
-import static com.reactnativenavigation.utils.ObjectUtils.perform;
+import javax.annotation.Nullable;
 
 public class ModalStack {
     private List<ViewController> modals = new ArrayList<>();
@@ -37,7 +35,7 @@ public class ModalStack {
         this.presenter = presenter;
     }
 
-    public void setModalsLayout(CoordinatorLayout modalsLayout) {
+    public void setModalsLayout(ViewGroup modalsLayout) {
         presenter.setModalsLayout(modalsLayout);
     }
 
@@ -61,19 +59,20 @@ public class ModalStack {
             boolean isDismissingTopModal = isTop(toDismiss);
             modals.remove(toDismiss);
             @Nullable ViewController toAdd = isEmpty() ? root : isDismissingTopModal ? get(size() - 1) : null;
+            CommandListenerAdapter onDismiss = new CommandListenerAdapter(listener) {
+                @Override
+                public void onSuccess(String childId) {
+                    eventEmitter.emitModalDismissed(componentId, 1);
+                    super.onSuccess(componentId);
+                }
+            };
             if (isDismissingTopModal) {
                 if (toAdd == null) {
                     listener.onError("Could not dismiss modal");
                     return false;
                 }
             }
-            presenter.dismissModal(toDismiss, toAdd, root, new CommandListenerAdapter(listener) {
-                @Override
-                public void onSuccess(String childId) {
-                    eventEmitter.emitModalDismissed(toDismiss.getId(), toDismiss.getCurrentComponentName(), 1);
-                    super.onSuccess(toDismiss.getId());
-                }
-            });
+            presenter.dismissModal(toDismiss, toAdd, root, onDismiss);
             return true;
         } else {
             listener.onError("Nothing to dismiss");
@@ -81,13 +80,13 @@ public class ModalStack {
         }
     }
 
-    public void dismissAllModals(@Nullable ViewController root, Options mergeOptions, CommandListener listener) {
+    public void dismissAllModals(ViewController root, Options mergeOptions, CommandListener listener) {
         if (modals.isEmpty()) {
-            listener.onSuccess(perform(root, "", ViewController::getId));
+            listener.onError("Nothing to dismiss");
             return;
         }
+
         String topModalId = peek().getId();
-        String topModalName = peek().getCurrentComponentName();
         int modalsDismissed = size();
 
         peek().mergeOptions(mergeOptions);
@@ -97,7 +96,7 @@ public class ModalStack {
                 dismissModal(modals.get(0).getId(), root, new CommandListenerAdapter(listener) {
                     @Override
                     public void onSuccess(String childId) {
-                        eventEmitter.emitModalDismissed(topModalId, topModalName, modalsDismissed);
+                        eventEmitter.emitModalDismissed(topModalId, modalsDismissed);
                         super.onSuccess(childId);
                     }
                 });

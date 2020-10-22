@@ -1,5 +1,4 @@
-import cloneDeep from 'lodash/cloneDeep';
-import map from 'lodash/map';
+import * as _ from 'lodash';
 import { CommandsObserver } from '../events/CommandsObserver';
 import { NativeCommandsSender } from '../adapters/NativeCommandsSender';
 import { UniqueIdProvider } from '../adapters/UniqueIdProvider';
@@ -9,8 +8,6 @@ import { LayoutTreeParser } from './LayoutTreeParser';
 import { LayoutTreeCrawler } from './LayoutTreeCrawler';
 import { OptionsProcessor } from './OptionsProcessor';
 import { Store } from '../components/Store';
-import { LayoutProcessor } from '../processors/LayoutProcessor';
-import { CommandName } from '../interfaces/CommandName';
 
 export class Commands {
   constructor(
@@ -20,37 +17,30 @@ export class Commands {
     private readonly layoutTreeCrawler: LayoutTreeCrawler,
     private readonly commandsObserver: CommandsObserver,
     private readonly uniqueIdProvider: UniqueIdProvider,
-    private readonly optionsProcessor: OptionsProcessor,
-    private readonly layoutProcessor: LayoutProcessor
+    private readonly optionsProcessor: OptionsProcessor
   ) {}
 
   public setRoot(simpleApi: LayoutRoot) {
-    const input = cloneDeep(simpleApi);
-    const processedRoot = this.layoutProcessor.process(input.root, CommandName.SetRoot);
-    const root = this.layoutTreeParser.parse(processedRoot);
+    const input = _.cloneDeep(simpleApi);
+    const root = this.layoutTreeParser.parse(input.root);
 
-    const modals = map(input.modals, (modal) => {
-      const processedModal = this.layoutProcessor.process(modal, CommandName.SetRoot);
-      return this.layoutTreeParser.parse(processedModal);
+    const modals = _.map(input.modals, (modal) => {
+      return this.layoutTreeParser.parse(modal);
     });
 
-    const overlays = map(input.overlays, (overlay: any) => {
-      const processedOverlay = this.layoutProcessor.process(overlay, CommandName.SetRoot);
-      return this.layoutTreeParser.parse(processedOverlay);
+    const overlays = _.map(input.overlays, (overlay) => {
+      return this.layoutTreeParser.parse(overlay);
     });
 
-    const commandId = this.uniqueIdProvider.generate(CommandName.SetRoot);
-    this.commandsObserver.notify(CommandName.SetRoot, {
-      commandId,
-      layout: { root, modals, overlays },
-    });
+    const commandId = this.uniqueIdProvider.generate('setRoot');
+    this.commandsObserver.notify('setRoot', { commandId, layout: { root, modals, overlays } });
 
-    this.layoutTreeCrawler.crawl(root, CommandName.SetRoot);
+    this.layoutTreeCrawler.crawl(root);
     modals.forEach((modalLayout) => {
-      this.layoutTreeCrawler.crawl(modalLayout, CommandName.SetRoot);
+      this.layoutTreeCrawler.crawl(modalLayout);
     });
     overlays.forEach((overlayLayout) => {
-      this.layoutTreeCrawler.crawl(overlayLayout, CommandName.SetRoot);
+      this.layoutTreeCrawler.crawl(overlayLayout);
     });
 
     const result = this.nativeCommandsSender.setRoot(commandId, { root, modals, overlays });
@@ -58,106 +48,96 @@ export class Commands {
   }
 
   public setDefaultOptions(options: Options) {
-    const input = cloneDeep(options);
-    this.optionsProcessor.processDefaultOptions(input, CommandName.SetDefaultOptions);
+    const input = _.cloneDeep(options);
+    this.optionsProcessor.processOptions(input);
 
     this.nativeCommandsSender.setDefaultOptions(input);
-    this.commandsObserver.notify(CommandName.SetDefaultOptions, { options });
+    this.commandsObserver.notify('setDefaultOptions', { options });
   }
 
   public mergeOptions(componentId: string, options: Options) {
-    const input = cloneDeep(options);
-    this.optionsProcessor.processOptions(input, CommandName.MergeOptions);
+    const input = _.cloneDeep(options);
+    this.optionsProcessor.processOptions(input);
 
     this.nativeCommandsSender.mergeOptions(componentId, input);
-    this.commandsObserver.notify(CommandName.MergeOptions, { componentId, options });
+    this.commandsObserver.notify('mergeOptions', { componentId, options });
   }
 
   public updateProps(componentId: string, props: object) {
-    this.store.updateProps(componentId, props);
-    this.commandsObserver.notify(CommandName.UpdateProps, { componentId, props });
+    const input = _.cloneDeep(props);
+    this.store.updateProps(componentId, input);
+    this.commandsObserver.notify('updateProps', { componentId, props });
   }
 
   public showModal(layout: Layout) {
-    const layoutCloned = cloneDeep(layout);
-    const layoutProcessed = this.layoutProcessor.process(layoutCloned, CommandName.ShowModal);
-    const layoutNode = this.layoutTreeParser.parse(layoutProcessed);
+    const layoutCloned = _.cloneDeep(layout);
+    const layoutNode = this.layoutTreeParser.parse(layoutCloned);
 
-    const commandId = this.uniqueIdProvider.generate(CommandName.ShowModal);
-    this.commandsObserver.notify(CommandName.ShowModal, { commandId, layout: layoutNode });
-    this.layoutTreeCrawler.crawl(layoutNode, CommandName.ShowModal);
+    const commandId = this.uniqueIdProvider.generate('showModal');
+    this.commandsObserver.notify('showModal', { commandId, layout: layoutNode });
+    this.layoutTreeCrawler.crawl(layoutNode);
 
     const result = this.nativeCommandsSender.showModal(commandId, layoutNode);
     return result;
   }
 
   public dismissModal(componentId: string, mergeOptions?: Options) {
-    const commandId = this.uniqueIdProvider.generate(CommandName.DismissModal);
+    const commandId = this.uniqueIdProvider.generate('dismissModal');
     const result = this.nativeCommandsSender.dismissModal(commandId, componentId, mergeOptions);
-    this.commandsObserver.notify(CommandName.DismissModal, {
-      commandId,
-      componentId,
-      mergeOptions,
-    });
+    this.commandsObserver.notify('dismissModal', { commandId, componentId, mergeOptions});
     return result;
   }
 
   public dismissAllModals(mergeOptions?: Options) {
-    const commandId = this.uniqueIdProvider.generate(CommandName.DismissAllModals);
+    const commandId = this.uniqueIdProvider.generate('dismissAllModals');
     const result = this.nativeCommandsSender.dismissAllModals(commandId, mergeOptions);
-    this.commandsObserver.notify(CommandName.DismissAllModals, { commandId, mergeOptions });
+    this.commandsObserver.notify('dismissAllModals', { commandId, mergeOptions });
     return result;
   }
 
   public push(componentId: string, simpleApi: Layout) {
-    const input = cloneDeep(simpleApi);
-    const layoutProcessed = this.layoutProcessor.process(input, CommandName.Push);
-    const layout = this.layoutTreeParser.parse(layoutProcessed);
+    const input = _.cloneDeep(simpleApi);
+    const layout = this.layoutTreeParser.parse(input);
 
-    const commandId = this.uniqueIdProvider.generate(CommandName.Push);
-    this.commandsObserver.notify(CommandName.Push, { commandId, componentId, layout });
-    this.layoutTreeCrawler.crawl(layout, CommandName.Push);
+    const commandId = this.uniqueIdProvider.generate('push');
+    this.commandsObserver.notify('push', { commandId, componentId, layout });
+    this.layoutTreeCrawler.crawl(layout);
 
     const result = this.nativeCommandsSender.push(commandId, componentId, layout);
     return result;
   }
 
   public pop(componentId: string, mergeOptions?: Options) {
-    const commandId = this.uniqueIdProvider.generate(CommandName.Pop);
+    const commandId = this.uniqueIdProvider.generate('pop');
     const result = this.nativeCommandsSender.pop(commandId, componentId, mergeOptions);
-    this.commandsObserver.notify(CommandName.Pop, { commandId, componentId, mergeOptions });
+    this.commandsObserver.notify('pop', { commandId, componentId, mergeOptions });
     return result;
   }
 
   public popTo(componentId: string, mergeOptions?: Options) {
-    const commandId = this.uniqueIdProvider.generate(CommandName.PopTo);
+    const commandId = this.uniqueIdProvider.generate('popTo');
     const result = this.nativeCommandsSender.popTo(commandId, componentId, mergeOptions);
-    this.commandsObserver.notify(CommandName.PopTo, { commandId, componentId, mergeOptions });
+    this.commandsObserver.notify('popTo', { commandId, componentId, mergeOptions });
     return result;
   }
 
   public popToRoot(componentId: string, mergeOptions?: Options) {
-    const commandId = this.uniqueIdProvider.generate(CommandName.PopToRoot);
+    const commandId = this.uniqueIdProvider.generate('popToRoot');
     const result = this.nativeCommandsSender.popToRoot(commandId, componentId, mergeOptions);
-    this.commandsObserver.notify(CommandName.PopToRoot, { commandId, componentId, mergeOptions });
+    this.commandsObserver.notify('popToRoot', { commandId, componentId, mergeOptions });
     return result;
   }
 
   public setStackRoot(componentId: string, children: Layout[]) {
-    const input = map(cloneDeep(children), (simpleApi) => {
-      const layoutProcessed = this.layoutProcessor.process(simpleApi, CommandName.SetStackRoot);
-      const layout = this.layoutTreeParser.parse(layoutProcessed);
+    const input = _.map(_.cloneDeep(children), (simpleApi) => {
+      const layout = this.layoutTreeParser.parse(simpleApi);
       return layout;
     });
 
-    const commandId = this.uniqueIdProvider.generate(CommandName.SetStackRoot);
-    this.commandsObserver.notify(CommandName.SetStackRoot, {
-      commandId,
-      componentId,
-      layout: input,
-    });
+    const commandId = this.uniqueIdProvider.generate('setStackRoot');
+    this.commandsObserver.notify('setStackRoot', { commandId, componentId, layout: input });
     input.forEach((layoutNode) => {
-      this.layoutTreeCrawler.crawl(layoutNode, CommandName.SetStackRoot);
+      this.layoutTreeCrawler.crawl(layoutNode);
     });
 
     const result = this.nativeCommandsSender.setStackRoot(commandId, componentId, input);
@@ -165,29 +145,28 @@ export class Commands {
   }
 
   public showOverlay(simpleApi: Layout) {
-    const input = cloneDeep(simpleApi);
-    const layoutProcessed = this.layoutProcessor.process(input, CommandName.ShowOverlay);
-    const layout = this.layoutTreeParser.parse(layoutProcessed);
+    const input = _.cloneDeep(simpleApi);
+    const layout = this.layoutTreeParser.parse(input);
 
-    const commandId = this.uniqueIdProvider.generate(CommandName.ShowOverlay);
-    this.commandsObserver.notify(CommandName.ShowOverlay, { commandId, layout });
-    this.layoutTreeCrawler.crawl(layout, CommandName.ShowOverlay);
+    const commandId = this.uniqueIdProvider.generate('showOverlay');
+    this.commandsObserver.notify('showOverlay', { commandId, layout });
+    this.layoutTreeCrawler.crawl(layout);
 
     const result = this.nativeCommandsSender.showOverlay(commandId, layout);
     return result;
   }
 
   public dismissOverlay(componentId: string) {
-    const commandId = this.uniqueIdProvider.generate(CommandName.DismissOverlay);
+    const commandId = this.uniqueIdProvider.generate('dismissOverlay');
     const result = this.nativeCommandsSender.dismissOverlay(commandId, componentId);
-    this.commandsObserver.notify(CommandName.DismissOverlay, { commandId, componentId });
+    this.commandsObserver.notify('dismissOverlay', { commandId, componentId });
     return result;
   }
 
   public getLaunchArgs() {
-    const commandId = this.uniqueIdProvider.generate(CommandName.GetLaunchArgs);
+    const commandId = this.uniqueIdProvider.generate('getLaunchArgs');
     const result = this.nativeCommandsSender.getLaunchArgs(commandId);
-    this.commandsObserver.notify(CommandName.GetLaunchArgs, { commandId });
+    this.commandsObserver.notify('getLaunchArgs', { commandId });
     return result;
   }
 }

@@ -8,7 +8,7 @@
 }
 
 + (CGFloat)topBarHeight {
-	return [RCTPresentedViewController() getTopBarHeight];
+	return [UIApplication .sharedApplication.delegate.window.rootViewController getTopBarHeight];
 }
 
 + (CGFloat)statusBarHeight {
@@ -16,7 +16,11 @@
 }
 
 + (CGFloat)bottomTabsHeight {
-	return [UIApplication.sharedApplication.delegate.window.rootViewController getBottomTabsHeight];
+	@try {
+		return CGRectGetHeight(((UITabBarController *) UIApplication.sharedApplication.windows[0].rootViewController).tabBar.frame);
+	} @catch (NSException *exception) {
+		return 0;
+	}
 }
 
 @end

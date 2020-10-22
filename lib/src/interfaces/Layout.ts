@@ -46,7 +46,7 @@ export interface LayoutStack {
   options?: Options;
 }
 
-export interface LayoutTabsChildren {
+export interface LayoutBottomTabsChildren {
   /**
    * Set stack
    */
@@ -59,10 +59,6 @@ export interface LayoutTabsChildren {
    * Set the external component
    */
   externalComponent?: ExternalComponent;
-  /**
-   * Set the side menu
-   */
-  sideMenu?: LayoutSideMenu;
 }
 
 export interface LayoutBottomTabs {
@@ -74,7 +70,7 @@ export interface LayoutBottomTabs {
   /**
    * Set the children screens
    */
-  children?: LayoutTabsChildren[];
+  children?: LayoutBottomTabsChildren[];
   /**
    * Set the bottom tabs options
    */
@@ -125,7 +121,7 @@ export interface LayoutSplitView {
   options?: Options;
 }
 
-export interface LayoutTopTabs {
+export interface TopTabs {
   /**
    * Set the layout's id so Navigation.mergeOptions can be used to update options
    */
@@ -133,7 +129,7 @@ export interface LayoutTopTabs {
   /**
    * Set the children screens
    */
-  children?: LayoutTabsChildren[];
+  children?: any[];
   /**
    * Configure top tabs
    */
@@ -192,7 +188,7 @@ export interface Layout<P = {}> {
   /**
    * Set the top tabs
    */
-  topTabs?: LayoutTopTabs;
+  topTabs?: TopTabs;
   /**
    * Set the external component
    */

@@ -6,7 +6,6 @@
 #import "RNNComponentOptions.h"
 #import "RNNBackButtonOptions.h"
 #import "RNNButtonOptions.h"
-#import "RNNSearchBarOptions.h"
 
 @interface RNNTopBarOptions : RNNOptions
 
@@ -22,14 +21,12 @@
 @property (nonatomic, strong) Bool* drawBehind;
 @property (nonatomic, strong) Bool* noBorder;
 @property (nonatomic, strong) Bool* animate;
-@property (nonatomic, strong) RNNSearchBarOptions* searchBar;
+@property (nonatomic, strong) Bool* searchBar;
 @property (nonatomic, strong) Bool* searchBarHiddenWhenScrolling;
 @property (nonatomic, strong) Bool* hideNavBarOnFocusSearchBar;
 @property (nonatomic, strong) Text* testID;
 @property (nonatomic, strong) Text* barStyle;
 @property (nonatomic, strong) Text* searchBarPlaceholder;
-@property (nonatomic, strong) Color* searchBarBackgroundColor;
-@property (nonatomic, strong) Color* searchBarTintColor;
 @property (nonatomic, strong) RNNLargeTitleOptions* largeTitle;
 @property (nonatomic, strong) RNNTitleOptions* title;
 @property (nonatomic, strong) RNNSubtitleOptions* subtitle;
@@ -38,6 +35,7 @@
 @property (nonatomic, strong) RNNButtonOptions* leftButtonStyle;
 @property (nonatomic, strong) RNNButtonOptions* rightButtonStyle;
 
-- (BOOL)shouldDrawBehind;
+
+@property (nonatomic, strong) RNNComponentOptions* component;
 
 @end

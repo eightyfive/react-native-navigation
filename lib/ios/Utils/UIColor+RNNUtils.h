@@ -2,5 +2,4 @@
 
 @interface UIColor (RNNUtils)
 - (NSString *)toHex;
-- (BOOL)isTransparent;
 @end

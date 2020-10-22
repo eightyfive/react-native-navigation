@@ -9,10 +9,6 @@
 
 @implementation Param
 
-+ (instancetype)withValue:(id)value {
-    return [[self.class alloc] initWithValue:value];
-}
-
 - (instancetype)initWithValue:(id)value {
 	self = [super init];
 	self.value = value;

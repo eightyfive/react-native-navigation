@@ -1,19 +1,24 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import <React/RCTBridge.h>
-#import "RNNModalManagerEventHandler.h"
 
 typedef void (^RNNTransitionCompletionBlock)(void);
-typedef void (^RNNTransitionWithComponentIdCompletionBlock)(NSString * _Nonnull componentId);
-typedef void (^RNNTransitionRejectionBlock)(NSString * _Nonnull code, NSString * _Nonnull message, NSError * _Nullable error);
+typedef void (^RNNTransitionWithComponentIdCompletionBlock)(NSString *componentId);
+typedef void (^RNNTransitionRejectionBlock)(NSString *code, NSString *message, NSError *error);
 
-@interface RNNModalManager : NSObject <UIAdaptivePresentationControllerDelegate>
+@protocol RNNModalManagerDelegate <NSObject>
 
-- (instancetype _Nonnull )initWithBridge:(RCTBridge * _Nonnull)bridge eventHandler:(RNNModalManagerEventHandler * _Nonnull)eventHandler;
+- (void)dismissedModal:(UIViewController *)viewController;
+- (void)dismissedMultipleModals:(NSArray *)viewControllers;
 
-- (void)showModal:(UIViewController * _Nonnull)viewController animated:(BOOL)animated completion:(RNNTransitionWithComponentIdCompletionBlock _Nullable)completion;
-- (void)dismissModal:(UIViewController * _Nullable)viewController completion:(RNNTransitionCompletionBlock _Nullable)completion;
-- (void)dismissAllModalsAnimated:(BOOL)animated completion:(void (^ __nullable)(void))completion;
-- (void)dismissAllModalsSynchronosly;
+@end
+
+@interface RNNModalManager : NSObject
+
+@property (nonatomic, weak) id<RNNModalManagerDelegate> delegate;
+
+- (void)showModal:(UIViewController *)viewController animated:(BOOL)animated completion:(RNNTransitionWithComponentIdCompletionBlock)completion;
+- (void)showModal:(UIViewController *)viewController animated:(BOOL)animated hasCustomAnimation:(BOOL)hasCustomAnimation completion:(RNNTransitionWithComponentIdCompletionBlock)completion;
+- (void)dismissModal:(UIViewController *)viewController completion:(RNNTransitionCompletionBlock)completion;
+- (void)dismissAllModalsAnimated:(BOOL)animated;
 
 @end

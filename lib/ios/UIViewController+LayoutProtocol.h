@@ -6,53 +6,25 @@ typedef void (^RNNReactViewReadyCompletionBlock)(void);
 
 @interface UIViewController (LayoutProtocol) <RNNLayoutProtocol>
 
-- (void)render;
+- (void)renderTreeAndWait:(BOOL)wait perform:(RNNReactViewReadyCompletionBlock)readyBlock;
 
 - (UIViewController *)getCurrentChild;
 
-- (UIViewController *)presentedComponentViewController;
-
-- (UIViewController *)findViewController:(UIViewController *)child;
-
-- (UIViewController *)topMostViewController;
-
-- (void)destroy;
-
 - (void)mergeOptions:(RNNNavigationOptions *)options;
 
-- (void)mergeChildOptions:(RNNNavigationOptions *)options child:(UIViewController *)child;
-
-- (void)onChildAddToParent:(UIViewController *)child options:(RNNNavigationOptions *)options;
-
-- (UINavigationController *)stack;
+- (void)mergeChildOptions:(RNNNavigationOptions *)options;
 
 - (RNNNavigationOptions *)resolveOptions;
-
-- (RNNNavigationOptions *)resolveOptionsWithDefault;
 
 - (void)setDefaultOptions:(RNNNavigationOptions *)defaultOptions;
 
 - (void)overrideOptions:(RNNNavigationOptions *)options;
-
-- (void)readyForPresentation;
-
-- (void)componentDidAppear;
-
-- (void)componentDidDisappear;
-
-- (void)screenPopped;
-
-- (void)loadChildren:(NSArray *)children;
 
 @property (nonatomic, retain) RNNBasePresenter* presenter;
 @property (nonatomic, retain) RNNLayoutInfo* layoutInfo;
 @property (nonatomic, strong) RNNNavigationOptions* options;
 @property (nonatomic, strong) RNNNavigationOptions* defaultOptions;
 @property (nonatomic, strong) RNNEventEmitter* eventEmitter;
-@property (nonatomic) id<RNNComponentViewCreator> creator;
-@property (nonatomic) RNNReactViewReadyCompletionBlock reactViewReadyCallback;
-@property (nonatomic) BOOL waitForRender;
-@property (nonatomic) BOOL isChildViewControllersLoaded;
-@property (nonatomic, strong) RNNReactView* reactView;
+@property (nonatomic) id<RNNRootViewCreator> creator;
 
 @end

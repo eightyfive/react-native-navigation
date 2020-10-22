@@ -29,8 +29,4 @@
 	return _springDamping ? _springDamping : DEFAULT_SPRING_DAMPING;
 }
 
-- (BOOL)hasValue {
-    return self.animations;
-}
-
 @end

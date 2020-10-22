@@ -1,10 +1,8 @@
-import merge from 'lodash/merge';
-import isFunction from 'lodash/isFunction';
+import * as _ from 'lodash';
 import { LayoutType } from './LayoutType';
 import { OptionsProcessor } from './OptionsProcessor';
 import { Store } from '../components/Store';
 import { Options } from '../interfaces/Options';
-import { CommandName } from '../interfaces/CommandName';
 
 export interface Data {
   name?: string;
@@ -25,12 +23,12 @@ export class LayoutTreeCrawler {
     this.crawl = this.crawl.bind(this);
   }
 
-  crawl(node: LayoutNode, commandName: CommandName): void {
+  crawl(node: LayoutNode): void {
     if (node.type === LayoutType.Component) {
       this.handleComponent(node);
     }
-    this.optionsProcessor.processOptions(node.data.options, commandName);
-    node.children.forEach((value: LayoutNode) => this.crawl(value, commandName));
+    this.optionsProcessor.processOptions(node.data.options);
+    node.children.forEach(this.crawl);
   }
 
   private handleComponent(node: LayoutNode) {
@@ -49,16 +47,14 @@ export class LayoutTreeCrawler {
   }
 
   private applyStaticOptions(node: LayoutNode) {
-    node.data.options = merge({}, this.staticOptionsIfPossible(node), node.data.options);
+    node.data.options = _.merge({}, this.staticOptionsIfPossible(node), node.data.options);
   }
 
   private staticOptionsIfPossible(node: LayoutNode) {
     const foundReactGenerator = this.store.getComponentClassForName(node.data.name!);
     const reactComponent = foundReactGenerator ? foundReactGenerator() : undefined;
     if (reactComponent && this.isComponentWithOptions(reactComponent)) {
-      return isFunction(reactComponent.options)
-        ? reactComponent.options({ componentId: node.id, ...node.data.passProps } || {})
-        : reactComponent.options;
+      return _.isFunction(reactComponent.options) ? reactComponent.options(node.data.passProps || {}) : reactComponent.options;
     }
     return {};
   }

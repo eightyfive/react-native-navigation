@@ -1,19 +1,18 @@
 package com.reactnativenavigation.utils;
 
 import android.graphics.Point;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewManager;
 import android.view.ViewParent;
 
 import com.facebook.react.views.view.ReactViewBackgroundDrawable;
+import com.reactnativenavigation.react.ReactView;
+import com.reactnativenavigation.utils.Functions.Func1;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import androidx.annotation.Nullable;
-
-import static com.reactnativenavigation.utils.ObjectUtils.perform;
 
 public class ViewUtils {
     @Nullable
@@ -43,7 +42,7 @@ public class ViewUtils {
         for (int i = 0; i < root.getChildCount(); i++) {
             View view = root.getChildAt(i);
             if (view instanceof ViewGroup) {
-                ret.addAll(findChildrenByClassRecursive((ViewGroup) view, clazz, matcher));
+                ret.addAll(findChildrenByClassRecursive((ViewGroup) view, clazz));
             }
             if (clazz.isAssignableFrom(view.getClass()) && matcher.match((T) view)) {
                 ret.add((T) view);
@@ -72,7 +71,7 @@ public class ViewUtils {
     }
 
     public static boolean isChildOf(ViewGroup parent, View child) {
-        if (parent == child) return false;
+        if (parent == child) return true;
 
         for (int i = 0; i < parent.getChildCount(); i++) {
             View view = parent.getChildAt(i);
@@ -92,6 +91,23 @@ public class ViewUtils {
         return view.getLayoutParams().height < 0 ? view.getHeight() : view.getLayoutParams().height;
     }
 
+    public static void performOnParentReactView(View child, Func1<ReactView> task) {
+        ReactView parent = findParentReactView(child.getParent());
+        if (parent != null) {
+            task.run(parent);
+        }
+    }
+
+    private static ReactView findParentReactView(ViewParent parent) {
+        if (parent == null) {
+            return null;
+        }
+        if (parent instanceof ReactView) {
+            return (ReactView) parent;
+        }
+        return findParentReactView(parent.getParent());
+    }
+
     public static Point getLocationOnScreen(View view) {
         int[] xy = new int[2];
         view.getLocationOnScreen(xy);
@@ -102,10 +118,11 @@ public class ViewUtils {
         return a.getWidth() == b.getWidth() && a.getHeight() == b.getHeight();
     }
 
-    public static int getIndexInParent(View view) {
-        ViewParent parent = view.getParent();
-        if (parent == null) return -1;
-        return ((ViewGroup) parent).indexOfChild(view);
+    public static boolean instanceOf(Class clazz, View... views) {
+        for (View view : views) {
+            if (!view.getClass().isAssignableFrom(clazz)) return false;
+        }
+        return true;
     }
 
     public static int getBackgroundColor(View view) {
@@ -115,19 +132,10 @@ public class ViewUtils {
         throw new RuntimeException(view.getBackground().getClass().getSimpleName() + " is not ReactViewBackgroundDrawable");
     }
 
-    public static void removeFromParent(@Nullable View view) {
-        if (view == null) return;
+    public static void removeFromParent(View view) {
         ViewParent parent = view.getParent();
         if (parent != null) {
             ((ViewManager) parent).removeView(view);
         }
-    }
-
-    public static boolean isVisible(View view) {
-        return perform(view, false, v -> v.getVisibility() == View.VISIBLE);
-    }
-
-    public static int topMargin(View view) {
-        return ((ViewGroup.MarginLayoutParams) view.getLayoutParams()).topMargin;
     }
 }
