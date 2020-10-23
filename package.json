@@ -1,5 +1,5 @@
 {
-  "name": "react-native-navigation",
+  "name": "@eightyfive/react-native-navigation",
   "version": "2.28.0",
   "description": "React Native Navigation - truly native navigation for iOS and Android",
   "license": "MIT",
