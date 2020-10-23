@@ -4,7 +4,7 @@ package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
 
 Pod::Spec.new do |s|
   s.name         = "ReactNativeNavigation"
-  s.version      = package['version']
+  s.version      = "2.29.0"
   s.summary      = package['description']
 
   s.authors      = "Wix.com"
