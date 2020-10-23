@@ -5,6 +5,7 @@
   "license": "MIT",
   "nativePackage": true,
   "publishConfig": {
+    "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
   "bugs": {
